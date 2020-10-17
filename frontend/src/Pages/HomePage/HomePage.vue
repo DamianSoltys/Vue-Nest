@@ -1,7 +1,8 @@
 <template>
   <div class="hello">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <h1>{{ msg }}</h1>
+    <img alt="Vue logo" src="../../assets/logo.png" />
+    <h1>{{ state.data }}</h1>
+    <button @click.prevent="handleClick()">Increment</button>
     <p>
       For a guide and recipes on how to configure / customize this project,<br />
       check out the
@@ -79,20 +80,26 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Options, Vue } from "vue-class-component";
-
-@Options({
-  props: {
-    msg: String
-  }
-})
-export default class HelloWorld extends Vue {
-  msg!: string;
-}
-</script>
-
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import "HelloWorld.style.scss";
+@import "HomePage.style.scss";
 </style>
+
+<script lang="ts">
+import { defineComponent,reactive } from "vue";
+
+export default defineComponent({
+  setup() {
+    const state = reactive({
+      data:0,
+    });
+
+    function handleClick() {
+      state.data+=1;
+    }
+
+    return {state,handleClick}
+  },
+});
+</script>
+
