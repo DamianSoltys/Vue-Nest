@@ -4,6 +4,6 @@ import { MysqlConfig } from './MysqlConfig.const';
 
 @Module({
   imports: [TypeOrmModule.forRoot(MysqlConfig)],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule],
 })
 export class MysqlModule {}

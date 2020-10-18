@@ -86,36 +86,31 @@
 </style>
 
 <script lang="ts">
-import { defineComponent,onMounted,reactive } from "vue";
+import { defineComponent, onMounted, reactive } from "vue";
 import { useStore } from "vuex";
 import { IInitalState } from "../../store/store.interface";
 
 export default defineComponent({
   props: {
-    data:String,
+    data: String
   },
-  setup(props,context) {
+  setup(props, context) {
     const store = useStore();
-    const storeState:IInitalState = store.state;
+    const storeState: IInitalState = store.state;
     const state = reactive({
-      data:0,
+      data: 0
     });
 
-    onMounted(()=>{
-      console.log(props)
-      console.log(context)
-
-      console.log(storeState.count);
-      store.dispatch('increment');
-      console.log(storeState.count);
+    onMounted(() => {
+      store.dispatch("increment");
     });
 
     function handleClick() {
-      state.data+=1;
+      state.data += 1;
     }
 
-    return {state,handleClick}
-  },
+    return { state, handleClick };
+  }
 });
 </script>
 
