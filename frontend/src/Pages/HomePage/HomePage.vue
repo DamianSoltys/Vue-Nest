@@ -1,82 +1,10 @@
 <template>
-  <div class="hello">
-    <img alt="Vue logo" src="../../assets/logo.png" />
-    <h1>{{ state.data }}</h1>
-    <button @click.prevent="handleClick()">Increment</button>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br />
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener"
-        >vue-cli documentation</a
-      >.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-typescript"
-          target="_blank"
-          rel="noopener"
-          >typescript</a
-        >
-      </li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li>
-        <a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a>
-      </li>
-      <li>
-        <a href="https://forum.vuejs.org" target="_blank" rel="noopener"
-          >Forum</a
-        >
-      </li>
-      <li>
-        <a href="https://chat.vuejs.org" target="_blank" rel="noopener"
-          >Community Chat</a
-        >
-      </li>
-      <li>
-        <a href="https://twitter.com/vuejs" target="_blank" rel="noopener"
-          >Twitter</a
-        >
-      </li>
-      <li>
-        <a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a>
-      </li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li>
-        <a href="https://router.vuejs.org" target="_blank" rel="noopener"
-          >vue-router</a
-        >
-      </li>
-      <li>
-        <a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a>
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-devtools#vue-devtools"
-          target="_blank"
-          rel="noopener"
-          >vue-devtools</a
-        >
-      </li>
-      <li>
-        <a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener"
-          >vue-loader</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/awesome-vue"
-          target="_blank"
-          rel="noopener"
-          >awesome-vue</a
-        >
-      </li>
-    </ul>
+  <div class="container">
+    <RegisterForm
+      v-if="!loginForm"
+      @submit-form="handleSubmit($event)"
+    ></RegisterForm>
+    <LoginForm v-if="loginForm" @submit-form="handleSubmit($event)"></LoginForm>
   </div>
 </template>
 
@@ -86,16 +14,27 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive } from "vue";
+import { defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { IInitalState } from "../../store/store.interface";
+import RegisterForm from "../../Components/RegisterForm/RegisterForm.vue";
+import LoginForm from "../../Components/LoginForm/LoginForm.vue";
 
 export default defineComponent({
+  components: { RegisterForm, LoginForm },
   props: {
     data: String
   },
   setup(props, context) {
     const store = useStore();
+    const loginForm = ref(true);
+    const form = reactive({
+      login: "",
+      password: "",
+      passwordConfirm: "",
+      algorithmType: "HMAC"
+    });
+
     const storeState: IInitalState = store.state;
     const state = reactive({
       data: 0
@@ -109,7 +48,11 @@ export default defineComponent({
       state.data += 1;
     }
 
-    return { state, handleClick };
+    function handleSubmit(formData: {}) {
+      console.log(formData);
+    }
+
+    return { form, state, handleClick, handleSubmit, loginForm };
   }
 });
 </script>
