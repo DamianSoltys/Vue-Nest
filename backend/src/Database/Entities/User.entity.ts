@@ -1,16 +1,25 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { AlgorithmTypeEnum } from '../constans/AlgorithmType.const';
+import { Password } from './Password.entity';
 
 @Entity()
-export class UserEntity {
+export class User {
+  @OneToMany(
+    () => Password,
+    password => password.idUser,
+  )
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({length:100,nullable:false})
-  firstName: string;
+  @Column({ length: 100 })
+  login: string;
 
-  @Column({length:100})
-  lastName: string;
+  @Column()
+  passwordHash: string;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column()
+  saltOrKey: string;
+
+  @Column()
+  algorithmType: AlgorithmTypeEnum;
 }

@@ -7,10 +7,6 @@ export class LoginController {
 
   @Get()
   getHello(): string {
-    this.loginService.getUsers();
-   this.loginService.addUser();
-   this.loginService.getUsers();
-
-   return 'hello';
+    return 'hello';
   }
 }
