@@ -1,11 +1,20 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { LockerControllerModule } from './API/locker/locker.module';
+import { UserControllerModule } from './API/user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { LoginModule } from './API/login.module';
 import { MysqlModule } from './Database/Configuration/mysql.module';
 
 @Module({
-  imports: [LoginModule,MysqlModule],
+  imports: [
+    LockerControllerModule,
+    UserControllerModule,
+    MysqlModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    })
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

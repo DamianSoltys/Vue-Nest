@@ -1,39 +1,42 @@
 <template>
-  <div class="container">
+ <div>
     <form>
-      <div class="form-section">
-        <label for="login">Login:</label>
-        <input type="text" name="login" v-model="form.login" />
+      <div class="form-section m-2">
+        <label class="form-label" for="login">Login:</label>
+        <input type="text" class="form-control" name="login" v-model="form.login" />
       </div>
-      <div class="form-section">
-        <label for="password">Hasło:</label>
-        <input type="text" name="password" v-model="form.password" />
+      <div class="form-section m-2">
+        <label class="form-label" for="password">Hasło:</label>
+        <input type="text" class="form-control" name="password" v-model="form.password" />
       </div>
-      <div class="form-section">
-        <label for="passwordConfirm">Potwierdź hasło:</label>
+      <div class="form-section m-2">
+        <label class="form-label" for="passwordConfirm">Potwierdź hasło:</label>
         <input
           type="text"
+          class="form-control"
           name="passwordConfirm"
           v-model="form.passwordConfirm"
         />
       </div>
-      <div class="form-section">
-        <label for="algorithmTypeOne">HMAC</label>
+      <div class="form-section m-2">
+        <label class="form-check-label m-2" for="algorithmTypeOne">HMAC</label>
         <input
           type="radio"
+          class="form-check-input m-2"
           name="algorithmTypeOne"
           v-model="form.algorithmType"
           value="HMAC"
         />
-        <label for="algorithmTypeTwo">SHA512</label>
+        <label class="form-check-label m-2" for="algorithmTypeTwo">SHA512</label>
         <input
           type="radio"
+          class="form-check-input m-2"
           name="algorithmTypeTwo"
           v-model="form.algorithmType"
           value="SHA512"
         />
       </div>
-      <button @click.prevent="handleSubmit()">Test</button>
+      <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">Zarejestruj</button>
     </form>
   </div>
 </template>
@@ -66,16 +69,18 @@ export default defineComponent({
       data: 0
     });
 
-    onMounted(() => {
-      store.dispatch("increment");
-    });
-
     function handleClick() {
       state.data += 1;
     }
 
     function handleSubmit() {
-      emit("submitForm", form);
+      const data = {
+        login: form.login,
+        password: form.password,
+        algorithmType: form.algorithmType
+      }
+      
+      emit("submit-form", data);
     }
 
     return { form, state, handleClick, handleSubmit };

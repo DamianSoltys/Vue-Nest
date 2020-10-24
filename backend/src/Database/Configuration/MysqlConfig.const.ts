@@ -7,7 +7,7 @@ export const MysqlConfig: TypeOrmModuleOptions = {
   host: 'localhost',
   port: 3306,
   username: 'root',
-  password: 'root',
+  password: '',
   database: 'bsi',
   entities: [User, Password],
   synchronize: true,

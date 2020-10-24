@@ -1,39 +1,15 @@
 <template>
-  <div class="container">
+  <div>
     <form>
-      <div class="form-section">
-        <label for="login">Login:</label>
-        <input type="text" name="login" v-model="form.login" />
+      <div class="form-section m-2">
+        <label class="form-label" for="login">Login:</label>
+        <input type="text" class="form-control" name="login" v-model="form.login" />
       </div>
-      <div class="form-section">
-        <label for="password">Hasło:</label>
-        <input type="text" name="password" v-model="form.password" />
+      <div class="form-section m-2">
+        <label class="form-label" for="password">Hasło:</label>
+        <input type="text" class="form-control" name="password" v-model="form.password" />
       </div>
-      <div class="form-section">
-        <label for="passwordConfirm">Potwierdź hasło:</label>
-        <input
-          type="text"
-          name="passwordConfirm"
-          v-model="form.passwordConfirm"
-        />
-      </div>
-      <div class="form-section">
-        <label for="algorithmTypeOne">HMAC</label>
-        <input
-          type="radio"
-          name="algorithmTypeOne"
-          v-model="form.algorithmType"
-          value="HMAC"
-        />
-        <label for="algorithmTypeTwo">SHA512</label>
-        <input
-          type="radio"
-          name="algorithmTypeTwo"
-          v-model="form.algorithmType"
-          value="SHA512"
-        />
-      </div>
-      <button @click.prevent="handleSubmit()">Test</button>
+      <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">Zaloguj</button>
     </form>
   </div>
 </template>
@@ -57,17 +33,11 @@ export default defineComponent({
     const form = reactive({
       login: "",
       password: "",
-      passwordConfirm: "",
-      algorithmType: "HMAC"
     });
 
     const storeState: IInitalState = store.state;
     const state = reactive({
       data: 0
-    });
-
-    onMounted(() => {
-      store.dispatch("increment");
     });
 
     function handleClick() {
