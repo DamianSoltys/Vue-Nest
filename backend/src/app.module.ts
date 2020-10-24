@@ -15,9 +15,6 @@ import { MysqlModule } from './Database/Configuration/mysql.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    SessionModule.forRoot({
-      session: { secret: 'K2ud78e4ulg8U1NOm0OhuFS5vAbkOBqNHLeESmq4A0qAirUndR' },
-    }),
   ],
   controllers: [AppController],
   providers: [AppService],

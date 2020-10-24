@@ -11,7 +11,7 @@ export class UserService {
         body: raw,
       };
 
-    return await fetch("http://localhost:3000/login", requestOptions)
+    return await fetch("http://localhost:3000/user/login", requestOptions)
       .then((response) => response.json())
       .then((result) => result)
       .catch((error) => console.log("error", error));
@@ -27,7 +27,7 @@ export class UserService {
         body: raw,
       };
 
-    return await fetch("http://localhost:3000/register", requestOptions)
+    return await fetch("http://localhost:3000/user/register", requestOptions)
       .then((response) => response.json())
       .then((result) => result)
       .catch((error) => console.log("error", error));

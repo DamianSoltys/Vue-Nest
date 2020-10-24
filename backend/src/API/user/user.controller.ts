@@ -1,20 +1,42 @@
-import { Body, Controller, Get, Post, Session } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Session } from '@nestjs/common';
 import { LoginUserDto, RegisterUserDto } from 'src/Database/Dto/user.dto';
 import { IUserSession } from './user.interface';
 import { UserControllerService } from './user.service';
 
-@Controller('login')
-export class LoginController {
+@Controller('user')
+export class UserController {
   constructor(private readonly userService: UserControllerService) {}
 
-  @Post()
-  loginUser(@Body() loginData:LoginUserDto): string {
-    const test = {
-      data:'tete',
-      data1:'tete'
-    }
+  @Post('login')
+  async loginUser(@Session() session: { user:IUserSession },@Body() loginData:LoginUserDto): Promise<boolean>  {
+    try {
+      const status = await this.userService.loginUser(loginData);
 
-    return JSON.stringify(test);
+      if(status) {
+        session.user = loginData;
+      }
+
+      console.log(session)
+
+      return status;
+    } catch {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'Something went wrong, try again later',
+      }, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('register')
+  async registerUser(@Body() registerData:RegisterUserDto): Promise<boolean> {
+    try {
+      return this.userService.registerUser(registerData);
+    } catch {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'Something went wrong, try again later',
+      }, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get()
@@ -23,13 +45,3 @@ export class LoginController {
   }
 }
 
-@Controller('register')
-export class RegisterController {
-  constructor(private readonly userService: UserControllerService) {}
-
-  @Post()
-  registerUser(@Session() session: { user:IUserSession },@Body() registerData:RegisterUserDto): string {
-    this.userService.registerUser(registerData);
-    return 'test';
-  }
-}
