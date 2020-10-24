@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { AlgorithmTypeEnum } from '../constans/AlgorithmType.const';
+import { AlgorithmTypeEnum } from '../constants/AlgorithmType.const';
 import { Password } from './Password.entity';
 
 @Entity()

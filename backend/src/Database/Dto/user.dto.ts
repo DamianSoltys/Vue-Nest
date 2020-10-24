@@ -1,4 +1,4 @@
-import { AlgorithmTypeEnum } from "../constans/AlgorithmType.const";
+import { AlgorithmTypeEnum } from "../constants/AlgorithmType.const";
 
 export class LoginUserDto {
   login: string;
