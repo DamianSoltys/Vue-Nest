@@ -3,13 +3,25 @@
     <form>
       <div class="form-section m-2">
         <label class="form-label" for="login">Login:</label>
-        <input type="text" class="form-control" name="login" v-model="form.login" />
+        <input
+          type="text"
+          class="form-control"
+          name="login"
+          v-model="form.username"
+        />
       </div>
       <div class="form-section m-2">
         <label class="form-label" for="password">Hasło:</label>
-        <input type="text" class="form-control" name="password" v-model="form.password" />
+        <input
+          type="text"
+          class="form-control"
+          name="password"
+          v-model="form.password"
+        />
       </div>
-      <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">Zaloguj</button>
+      <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">
+        Zaloguj
+      </button>
     </form>
   </div>
 </template>
@@ -31,8 +43,8 @@ export default defineComponent({
   setup(props, { emit }) {
     const store = useStore();
     const form = reactive({
-      login: "",
-      password: "",
+      username: "",
+      password: ""
     });
 
     const storeState: IInitalState = store.state;

@@ -1,6 +1,6 @@
 export class PasswordDto {
-  login:string;
-  webAddress:string;
-  password:string;
-  description:string;
+  username: string;
+  webAddress: string;
+  password: string;
+  description: string;
 }

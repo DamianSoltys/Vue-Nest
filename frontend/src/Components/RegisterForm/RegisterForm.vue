@@ -1,13 +1,23 @@
 <template>
- <div>
+  <div>
     <form>
       <div class="form-section m-2">
         <label class="form-label" for="login">Login:</label>
-        <input type="text" class="form-control" name="login" v-model="form.login" />
+        <input
+          type="text"
+          class="form-control"
+          name="login"
+          v-model="form.username"
+        />
       </div>
       <div class="form-section m-2">
         <label class="form-label" for="password">Hasło:</label>
-        <input type="text" class="form-control" name="password" v-model="form.password" />
+        <input
+          type="text"
+          class="form-control"
+          name="password"
+          v-model="form.password"
+        />
       </div>
       <div class="form-section m-2">
         <label class="form-label" for="passwordConfirm">Potwierdź hasło:</label>
@@ -27,7 +37,9 @@
           v-model="form.algorithmType"
           value="HMAC"
         />
-        <label class="form-check-label m-2" for="algorithmTypeTwo">SHA512</label>
+        <label class="form-check-label m-2" for="algorithmTypeTwo"
+          >SHA512</label
+        >
         <input
           type="radio"
           class="form-check-input m-2"
@@ -36,7 +48,9 @@
           value="SHA512"
         />
       </div>
-      <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">Zarejestruj</button>
+      <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">
+        Zarejestruj
+      </button>
     </form>
   </div>
 </template>
@@ -58,7 +72,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const store = useStore();
     const form = reactive({
-      login: "",
+      username: "",
       password: "",
       passwordConfirm: "",
       algorithmType: "HMAC"
@@ -75,11 +89,11 @@ export default defineComponent({
 
     function handleSubmit() {
       const data = {
-        login: form.login,
+        username: form.username,
         password: form.password,
         algorithmType: form.algorithmType
-      }
-      
+      };
+
       emit("submit-form", data);
     }
 

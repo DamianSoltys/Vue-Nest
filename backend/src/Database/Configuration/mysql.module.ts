@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MysqlConfig } from './MysqlConfig.const';
+import { MysqlConfig } from './mysqlConfig.const';
 
 @Module({
   imports: [TypeOrmModule.forRoot(MysqlConfig)],

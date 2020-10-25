@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Password } from 'src/Database/Entities/Password.entity';
+import { Password } from 'src/database/entities/password.entity';
 import { InsertResult, Repository } from 'typeorm';
 
 @Injectable()

@@ -1,12 +1,12 @@
-import { AlgorithmTypeEnum } from "../constants/AlgorithmType.const";
+import { AlgorithmTypeEnum } from '../constants/algorithmType.const';
 
 export class LoginUserDto {
-  login: string;
+  username: string;
   password: string;
 }
 
 export class RegisterUserDto {
-  login: string;
+  username: string;
   password: string;
   algorithmType: AlgorithmTypeEnum;
 }

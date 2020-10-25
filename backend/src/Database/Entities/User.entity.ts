@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { AlgorithmTypeEnum } from '../constants/AlgorithmType.const';
-import { Password } from './Password.entity';
+import { AlgorithmTypeEnum } from '../constants/algorithmType.const';
+import { Password } from './password.entity';
 
 @Entity()
 export class User {
@@ -12,7 +12,7 @@ export class User {
   id: number;
 
   @Column({ length: 100 })
-  login: string;
+  username: string;
 
   @Column()
   passwordHash: string;

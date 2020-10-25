@@ -3,27 +3,42 @@
     <div class="row">
       <nav class="bg-light d-flex justify-content-between">
         <div>
-         <span class="logo-text"> BSI Locker App </span>
+          <span class="logo-text"> BSI Locker App </span>
         </div>
 
         <div>
-          <button @click="loginForm = true" class="btn btn-primary m-1">Login</button>
-          <button @click="loginForm = false" class="btn btn-primary m-1">Register</button>
-          <span class="m-5">Nazwa</span>
+          <div v-if="!state.logged">
+            <button @click="loginForm = true" class="btn btn-primary m-1">
+              Login
+            </button>
+            <button @click="loginForm = false" class="btn btn-primary m-1">
+              Register
+            </button>
+          </div>
+          <div v-if="state.logged">
+            <button @click="logout()" class="btn btn-primary m-1">
+              Wyloguj
+            </button>
+            <span class="m-5">{{ state.username }}</span>
+          </div>
         </div>
       </nav>
     </div>
 
-    <div class="d-flex justify-content-center"> 
+    <div class="d-flex justify-content-center" v-if="!state.logged">
       <RegisterForm
         v-if="!loginForm"
         @submit-form="handleSubmit($event)"
       ></RegisterForm>
-      
-      <LoginForm 
-        v-if="loginForm" 
+
+      <LoginForm
+        v-if="loginForm"
         @submit-form="handleSubmit($event)"
       ></LoginForm>
+    </div>
+
+    <div class="d-flex justify-content-center" v-if="state.logged">
+      Zalogowany
     </div>
   </div>
 </template>
@@ -34,11 +49,11 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { IInitalState } from "../../store/store.interface";
-import RegisterForm from "../../components/RegisterForm/RegisterForm.vue";
-import LoginForm from "../../components/LoginForm/LoginForm.vue";
+import RegisterForm from "../../components/registerForm/registerForm.vue";
+import LoginForm from "../../components/loginForm/loginForm.vue";
 
 export default defineComponent({
   components: { RegisterForm, LoginForm },
@@ -49,32 +64,36 @@ export default defineComponent({
     const store = useStore();
     const loginForm = ref(true);
 
-    const storeState: IInitalState = store.state;
+    const storeState: IInitalState = reactive(store.state);
     const state = reactive({
-      data: 0
+      data: 0,
+      logged: computed(() => storeState.logged),
+      username: computed(() => storeState.username)
     });
 
     onMounted(() => {
-     console.log('test');
+      console.log(state);
     });
 
-    function handleClick() {
-      state.data += 1;
+    function logout() {
+      store.dispatch("LOGOUT_USER").then(data => {
+        console.log(data);
+      });
     }
 
     function handleSubmit(formData: {}) {
-      if(loginForm.value) {
-        store.dispatch('LOGIN_USER',formData).then(data=>{
-          console.log(data);
+      if (loginForm.value) {
+        store.dispatch("LOGIN_USER", formData).then(data => {
+          console.log(data, state);
         });
       } else {
-        store.dispatch('REGISTER_USER',formData).then(data=>{
+        store.dispatch("REGISTER_USER", formData).then(data => {
           console.log(data);
         });
       }
     }
 
-    return { state, handleClick, handleSubmit, loginForm };
+    return { state, handleSubmit, loginForm, logout };
   }
 });
 </script>

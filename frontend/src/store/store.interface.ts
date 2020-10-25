@@ -1,4 +1,5 @@
 export interface IInitalState {
-  logged:boolean;
-  count:number;
+  username: string;
+  logged: boolean;
+  count: number;
 }

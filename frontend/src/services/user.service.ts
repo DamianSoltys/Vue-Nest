@@ -1,50 +1,80 @@
-import { ILoginData, IRegisterData } from '@/interfaces/User.interface';
+import {
+  ILoginData,
+  ILoginResponse,
+  IRegisterData
+} from "@/interfaces/User.interface";
 
 export class UserService {
-  async loginUser(userData:ILoginData) {
+  public async loginUser(userData: ILoginData): Promise<ILoginResponse> {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     const raw = JSON.stringify(userData);
-    const requestOptions:RequestInit = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-      };
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw
+    };
+    const request: ILoginResponse = await fetch(
+      "http://localhost:3000/user/login",
+      requestOptions
+    )
+      .then(response => response.json())
+      .then(result => result)
+      .catch(error => console.log("error", error));
 
-    return await fetch("http://localhost:3000/user/login", requestOptions)
-      .then((response) => response.json())
-      .then((result) => result)
-      .catch((error) => console.log("error", error));
+    if (request?.access_token) {
+      this.saveLoginData(request.access_token, request.username);
+    }
+
+    return request;
   }
 
-  async registerUser(userData:IRegisterData) {
+  public logoutUser() {
+    localStorage.clear();
+
+    return true;
+  }
+
+  public async registerUser(userData: IRegisterData) {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     const raw = JSON.stringify(userData);
-    const requestOptions:RequestInit = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-      };
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw
+    };
 
     return await fetch("http://localhost:3000/user/register", requestOptions)
-      .then((response) => response.json())
-      .then((result) => result)
-      .catch((error) => console.log("error", error));
+      .then(response => response.json())
+      .then(result => result)
+      .catch(error => console.log("error", error));
   }
 
-  getTest() {
+  public getTest() {
     const myHeaders = new Headers();
-    
-    const requestOptions:RequestInit = {
-        method: "GET",
-        headers: myHeaders,
-      };
+    myHeaders.append("Authorization", `Bearer ${this.getToken()}`);
+    const requestOptions: RequestInit = {
+      method: "GET",
+      headers: myHeaders
+    };
 
-      fetch("localhost:3000/login", requestOptions)
-      .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.log("error", error));
+    fetch("http://localhost:3000/user", requestOptions)
+      .then(response => response.text())
+      .then(result => console.log(result))
+      .catch(error => console.log("error", error));
+
+    return false;
+  }
+
+  //TODO: improve
+  private saveLoginData(token: string, username: string) {
+    localStorage.setItem("token", token);
+  }
+
+  //TODO: improve
+  private getToken() {
+    return localStorage.getItem("token");
   }
 }
 
