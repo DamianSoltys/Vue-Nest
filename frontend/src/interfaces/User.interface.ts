@@ -9,6 +9,6 @@ export interface IRegisterData extends ILoginData {
 }
 
 export interface ILoginResponse {
-  access_token: string;
+  accessToken: string;
   username: string;
 }

@@ -10,3 +10,9 @@ export class RegisterUserDto {
   password: string;
   algorithmType: AlgorithmTypeEnum;
 }
+
+export class ChangePasswordDto {
+  username: string;
+  password: string;
+  changePassword: string;
+}

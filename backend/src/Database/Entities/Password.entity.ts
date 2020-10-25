@@ -13,13 +13,16 @@ export class Password {
     () => User,
     user => user.id,
   )
-  idUser: string;
+  idUser: number;
 
   @Column()
   web_address: string;
 
   @Column({ length: 100 })
   description: string;
+
+  @Column()
+  username: string;
 
   @Column()
   login: string;

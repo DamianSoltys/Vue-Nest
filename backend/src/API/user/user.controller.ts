@@ -31,15 +31,15 @@ export class UserController {
   async loginUser(
     @Body() loginData: LoginUserDto,
     @Request() req,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ accessToken: string }> {
     try {
       const status = await this.userService.loginUser(loginData);
 
       if (status) {
-        this.appService.userPassword = loginData.password;
+        this.appService.users.push(loginData);
       }
 
-      console.log(this.appService.userPassword);
+      console.log(this.appService.users);
 
       return this.authService.login(req.user);
     } catch {
@@ -71,7 +71,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get()
   test(): string {
-    console.log(this.appService.userPassword);
+    console.log(this.appService.users);
     return JSON.stringify('hello');
   }
 }

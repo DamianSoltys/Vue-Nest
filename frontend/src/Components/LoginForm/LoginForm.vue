@@ -28,7 +28,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import "LoginForm.style.scss";
+@import "loginForm.style.scss";
 </style>
 
 <script lang="ts">
@@ -37,9 +37,6 @@ import { useStore } from "vuex";
 import { IInitalState } from "../../store/store.interface";
 
 export default defineComponent({
-  props: {
-    data: String
-  },
   setup(props, { emit }) {
     const store = useStore();
     const form = reactive({
@@ -47,20 +44,11 @@ export default defineComponent({
       password: ""
     });
 
-    const storeState: IInitalState = store.state;
-    const state = reactive({
-      data: 0
-    });
-
-    function handleClick() {
-      state.data += 1;
-    }
-
     function handleSubmit() {
       emit("submit-form", form);
     }
 
-    return { form, state, handleClick, handleSubmit };
+    return { form, handleSubmit };
   }
 });
 </script>

@@ -1,3 +1,4 @@
+import { IChangePasswordData } from "@/interfaces/password.interface";
 import {
   ILoginData,
   ILoginResponse,
@@ -22,8 +23,8 @@ export class UserService {
       .then(result => result)
       .catch(error => console.log("error", error));
 
-    if (request?.access_token) {
-      this.saveLoginData(request.access_token, request.username);
+    if (request?.accessToken) {
+      this.saveLoginData(request.accessToken, request.username);
     }
 
     return request;
@@ -51,6 +52,27 @@ export class UserService {
       .catch(error => console.log("error", error));
   }
 
+  public async changePassword(passwordData: IChangePasswordData): Promise<any> {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
+    const raw = JSON.stringify(passwordData);
+    const requestOptions: RequestInit = {
+      method: "PUT",
+      headers: myHeaders,
+      body: raw
+    };
+    const request: any = await fetch(
+      "http://localhost:3000/user/locker",
+      requestOptions
+    )
+      .then(response => response.json())
+      .then(result => result)
+      .catch(error => console.log("error", error));
+
+    return request;
+  }
+
   public getTest() {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${this.getToken()}`);
@@ -68,13 +90,19 @@ export class UserService {
   }
 
   //TODO: improve
-  private saveLoginData(token: string, username: string) {
-    localStorage.setItem("token", token);
+  public getToken() {
+    return localStorage.getItem("token");
   }
 
   //TODO: improve
-  private getToken() {
-    return localStorage.getItem("token");
+  public getName() {
+    return localStorage.getItem("username");
+  }
+
+  //TODO: improve
+  private saveLoginData(token: string, username: string) {
+    localStorage.setItem("token", token);
+    localStorage.setItem("username", username);
   }
 }
 

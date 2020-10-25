@@ -38,7 +38,43 @@
     </div>
 
     <div class="d-flex justify-content-center" v-if="state.logged">
-      Zalogowany
+      <p>
+        <button
+          class="btn btn-primary"
+          data-toggle="collapse"
+          href="#passwordForm"
+          role="button"
+          aria-expanded="false"
+          aria-controls="passwordForm"
+        >
+          Toggle first element
+        </button>
+        <button
+          class="btn btn-primary"
+          data-toggle="collapse"
+          data-target="#passwordList"
+          aria-expanded="false"
+          aria-controls="passwordList"
+        >
+          Toggle second element
+        </button>
+      </p>
+      <div class="row">
+        <div class="col">
+          <div class="collapse multi-collapse" id="passwordForm">
+            <div class="card card-body">
+              <PasswordForm @submit-form="addPassword($event)"></PasswordForm>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="collapse multi-collapse" id="passwordList">
+            <div class="card card-body">
+              <PasswordList></PasswordList>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -54,17 +90,16 @@ import { useStore } from "vuex";
 import { IInitalState } from "../../store/store.interface";
 import RegisterForm from "../../components/registerForm/registerForm.vue";
 import LoginForm from "../../components/loginForm/loginForm.vue";
+import PasswordForm from "../../components/passwordForm/passwordForm.vue";
+import PasswordList from "../../components/passwordList/passwordList.vue";
 
 export default defineComponent({
-  components: { RegisterForm, LoginForm },
-  props: {
-    data: String
-  },
-  setup(props, context) {
+  components: { RegisterForm, LoginForm, PasswordForm, PasswordList },
+  setup() {
     const store = useStore();
     const loginForm = ref(true);
 
-    const storeState: IInitalState = reactive(store.state);
+    const storeState: IInitalState = store.state;
     const state = reactive({
       data: 0,
       logged: computed(() => storeState.logged),
@@ -72,28 +107,26 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      console.log(state);
+      store.dispatch("CHECK_AUTH");
     });
 
     function logout() {
-      store.dispatch("LOGOUT_USER").then(data => {
-        console.log(data);
-      });
+      store.dispatch("LOGOUT_USER");
+    }
+
+    function addPassword(formData: {}) {
+      console.log(formData);
     }
 
     function handleSubmit(formData: {}) {
       if (loginForm.value) {
-        store.dispatch("LOGIN_USER", formData).then(data => {
-          console.log(data, state);
-        });
+        store.dispatch("LOGIN_USER", formData);
       } else {
-        store.dispatch("REGISTER_USER", formData).then(data => {
-          console.log(data);
-        });
+        store.dispatch("REGISTER_USER", formData);
       }
     }
 
-    return { state, handleSubmit, loginForm, logout };
+    return { state, addPassword, handleSubmit, loginForm, logout };
   }
 });
 </script>

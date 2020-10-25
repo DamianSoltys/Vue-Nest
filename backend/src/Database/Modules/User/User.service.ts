@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, InsertResult } from 'typeorm';
 import { User } from 'src/database/entities/user.entity';
-import { LoginUserDto, RegisterUserDto } from 'src/database/dto/user.dto';
+import {
+  ChangePasswordDto,
+  LoginUserDto,
+  RegisterUserDto,
+} from 'src/database/dto/user.dto';
 import { ConfigService } from '@nestjs/config';
 import { AlgorithmTypeEnum } from 'src/database/constants/algorithmType.const';
 var CryptoJS = require('crypto-js');
@@ -23,21 +27,10 @@ export class UserService {
     password,
     algorithmType,
   }: RegisterUserDto): Promise<InsertResult> | null {
-    let passwordHash = '';
-    let saltOrKey = '';
-
-    if (algorithmType === 'HMAC') {
-      saltOrKey = this.configSerivce.get<string>('SECRET_KEY');
-
-      passwordHash = CryptoJS.HmacSHA512(password, saltOrKey).toString();
-    } else {
-      saltOrKey = CryptoJS.lib.WordArray.random(128 / 8).toString();
-      const pepper = this.configSerivce.get<string>('PEPPER');
-
-      passwordHash = CryptoJS.SHA512(
-        `${pepper}${saltOrKey}${password}`,
-      ).toString();
-    }
+    const { passwordHash, saltOrKey } = this.hashPassword(
+      algorithmType,
+      password,
+    );
 
     const searchResult = await this.getUserByLogin(username);
     let insertResult = null;
@@ -58,7 +51,6 @@ export class UserService {
       .where('user.username = :username', { username })
       .getOne();
 
-    console.log('search');
     return searchResult;
   }
 
@@ -76,15 +68,61 @@ export class UserService {
     return this.comparePassword(searchResult, password);
   }
 
-  //TODO: implement
-  public async changePassword(): Promise<InsertResult> {
-    const insertResult = this.queryBuilder
-      .insert()
-      .into(User)
-      .values({})
+  //TODO: add try catch implement changing all passwords
+  public async changePassword(
+    passwordData: ChangePasswordDto,
+  ): Promise<boolean> {
+    const searchResult = await this.getUserByLogin(passwordData.username);
+
+    if (!searchResult) {
+      return false;
+    }
+
+    const comparePassword = this.comparePassword(
+      searchResult,
+      passwordData.changePassword,
+    );
+
+    if (!comparePassword) {
+      return false;
+    }
+
+    const { passwordHash, saltOrKey } = this.hashPassword(
+      searchResult.algorithmType,
+      passwordData.changePassword,
+    );
+
+    const changeResult = this.queryBuilder
+      .update(User)
+      .set({ passwordHash, saltOrKey })
+      .where('username = :username', { username: searchResult.username })
       .execute();
 
-    return insertResult;
+    if (!changeResult) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public hashPassword(algorithmType: AlgorithmTypeEnum, password: string) {
+    let passwordHash = '';
+    let saltOrKey = '';
+
+    if (algorithmType === AlgorithmTypeEnum.HMAC) {
+      saltOrKey = this.configSerivce.get<string>('SECRET_KEY');
+
+      passwordHash = CryptoJS.HmacSHA512(password, saltOrKey).toString();
+    } else {
+      saltOrKey = CryptoJS.lib.WordArray.random(128 / 8).toString();
+      const pepper = this.configSerivce.get<string>('PEPPER');
+
+      passwordHash = CryptoJS.SHA512(
+        `${pepper}${saltOrKey}${password}`,
+      ).toString();
+    }
+
+    return { passwordHash, saltOrKey };
   }
 
   public comparePassword(userData: User, password: string) {

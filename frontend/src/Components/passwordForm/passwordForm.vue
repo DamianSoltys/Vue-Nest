@@ -7,49 +7,38 @@
           type="text"
           class="form-control"
           name="login"
-          v-model="form.username"
+          v-model="form.login"
         />
       </div>
       <div class="form-section m-2">
         <label class="form-label" for="password">Hasło:</label>
         <input
-          type="text"
+          type="password"
           class="form-control"
           name="password"
           v-model="form.password"
         />
       </div>
       <div class="form-section m-2">
-        <label class="form-label" for="passwordConfirm">Potwierdź hasło:</label>
+        <label class="form-label" for="webAddress">Adres strony:</label>
         <input
           type="text"
           class="form-control"
-          name="passwordConfirm"
-          v-model="form.passwordConfirm"
+          name="webAddress"
+          v-model="form.webAddress"
         />
       </div>
       <div class="form-section m-2">
-        <label class="form-check-label m-2" for="algorithmTypeOne">HMAC</label>
+        <label class="form-label" for="description">Opis:</label>
         <input
-          type="radio"
-          class="form-check-input m-2"
-          name="algorithmTypeOne"
-          v-model="form.algorithmType"
-          value="HMAC"
-        />
-        <label class="form-check-label m-2" for="algorithmTypeTwo"
-          >SHA512</label
-        >
-        <input
-          type="radio"
-          class="form-check-input m-2"
-          name="algorithmTypeTwo"
-          v-model="form.algorithmType"
-          value="SHA512"
+          type="text"
+          class="form-control"
+          name="description"
+          v-model="form.description"
         />
       </div>
       <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">
-        Zarejestruj
+        Dodaj hasło
       </button>
     </form>
   </div>
@@ -57,11 +46,11 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import "registerForm.style.scss";
+@import "passwordForm.style.scss";
 </style>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { IInitalState } from "../../store/store.interface";
 
@@ -69,32 +58,24 @@ export default defineComponent({
   setup(props, { emit }) {
     const store = useStore();
     const form = reactive({
-      username: "",
+      webAddress: "",
+      login: "",
       password: "",
-      passwordConfirm: "",
-      algorithmType: "HMAC"
+      description: ""
     });
 
     const storeState: IInitalState = store.state;
     const state = reactive({
-      data: 0
+      username: computed(() => storeState.username)
     });
 
-    function handleClick() {
-      state.data += 1;
-    }
-
     function handleSubmit() {
-      const data = {
-        username: form.username,
-        password: form.password,
-        algorithmType: form.algorithmType
-      };
+      const data = { ...form, username: state.username };
 
       emit("submit-form", data);
     }
 
-    return { form, state, handleClick, handleSubmit };
+    return { form, state, handleSubmit };
   }
 });
 </script>
