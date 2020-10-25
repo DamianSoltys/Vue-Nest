@@ -7,9 +7,6 @@ import { UserService } from './User.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),    
-    SessionModule.forRoot({
-      session: { secret: 'K2ud78e4ulg8U1NOm0OhuFS5vAbkOBqNHLeESmq4A0qAirUndR' },
-    }),
   ],
   providers: [UserService],
   exports: [TypeOrmModule, UserService],
