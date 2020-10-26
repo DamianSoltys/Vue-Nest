@@ -1,5 +1,8 @@
+import { IPasswordsList } from "@/interfaces/password.interface";
+
 export interface IInitalState {
   username: string;
   logged: boolean;
-  count: number;
+  userId: number | null;
+  passwords: IPasswordsList[];
 }

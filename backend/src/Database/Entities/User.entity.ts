@@ -6,7 +6,7 @@ import { Password } from './password.entity';
 export class User {
   @OneToMany(
     () => Password,
-    password => password.idUser,
+    password => password.user,
   )
   @PrimaryGeneratedColumn()
   id: number;

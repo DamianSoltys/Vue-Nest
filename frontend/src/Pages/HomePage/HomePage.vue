@@ -16,6 +16,12 @@
             </button>
           </div>
           <div v-if="state.logged">
+            <button @click="state.list = true" class="btn btn-primary m-1">
+              Zobacz hasła
+            </button>
+            <button @click="state.list = false" class="btn btn-primary m-1">
+              Dodaj hasło
+            </button>
             <button @click="logout()" class="btn btn-primary m-1">
               Wyloguj
             </button>
@@ -36,45 +42,12 @@
         @submit-form="handleSubmit($event)"
       ></LoginForm>
     </div>
-
     <div class="d-flex justify-content-center" v-if="state.logged">
-      <p>
-        <button
-          class="btn btn-primary"
-          data-toggle="collapse"
-          href="#passwordForm"
-          role="button"
-          aria-expanded="false"
-          aria-controls="passwordForm"
-        >
-          Toggle first element
-        </button>
-        <button
-          class="btn btn-primary"
-          data-toggle="collapse"
-          data-target="#passwordList"
-          aria-expanded="false"
-          aria-controls="passwordList"
-        >
-          Toggle second element
-        </button>
-      </p>
-      <div class="row">
-        <div class="col">
-          <div class="collapse multi-collapse" id="passwordForm">
-            <div class="card card-body">
-              <PasswordForm @submit-form="addPassword($event)"></PasswordForm>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="collapse multi-collapse" id="passwordList">
-            <div class="card card-body">
-              <PasswordList></PasswordList>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PasswordForm
+        @submit-form="addPassword($event)"
+        v-if="!state.list"
+      ></PasswordForm>
+      <PasswordList v-if="state.list"></PasswordList>
     </div>
   </div>
 </template>
@@ -101,7 +74,7 @@ export default defineComponent({
 
     const storeState: IInitalState = store.state;
     const state = reactive({
-      data: 0,
+      list: true,
       logged: computed(() => storeState.logged),
       username: computed(() => storeState.username)
     });
@@ -115,7 +88,7 @@ export default defineComponent({
     }
 
     function addPassword(formData: {}) {
-      console.log(formData);
+      store.dispatch("ADD_PASSWORD", formData);
     }
 
     function handleSubmit(formData: {}) {

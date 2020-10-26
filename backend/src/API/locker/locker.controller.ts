@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   Query,
+  Session,
 } from '@nestjs/common';
 import { PasswordDto } from 'src/database/Dto/password.dto';
 import { IDecryptedPasswordQuery } from './locker.interface';
@@ -15,8 +16,11 @@ import { LockerService } from './locker.service';
 export class LockerController {
   constructor(private readonly lockerService: LockerService) {}
 
-  @Post('locker')
-  async addPassword(@Body() passwordDto: PasswordDto) {
+  @Post()
+  async addPassword(
+    @Body() passwordDto: PasswordDto,
+    @Session() session: { password: string },
+  ) {
     try {
       return await this.lockerService.addPasswordToDatabase(passwordDto);
     } catch {
@@ -30,10 +34,10 @@ export class LockerController {
     }
   }
 
-  @Get('locker')
-  getPasswords(@Query('username') username: string) {
+  @Get()
+  getPasswords(@Query('userId') id: number) {
     try {
-      return this.lockerService.getPasswordsFromDatabase(username);
+      return this.lockerService.getPasswordsFromDatabase(id);
     } catch {
       throw new HttpException(
         {
@@ -45,7 +49,7 @@ export class LockerController {
     }
   }
 
-  @Get('locker/decrypt')
+  @Get('decrypt')
   async getDecryptedPassword(@Query() query: IDecryptedPasswordQuery) {
     try {
       return this.lockerService.getDecryptedPasswordFromDatabase(query);

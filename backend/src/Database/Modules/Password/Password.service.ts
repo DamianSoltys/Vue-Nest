@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IDecryptedPasswordQuery } from 'src/api/locker/locker.interface';
 import { AppService } from 'src/app.service';
@@ -17,12 +18,13 @@ export class PasswordService {
     private passwordRepository: Repository<Password>,
     private userDbService: UserService,
     private appService: AppService,
+    private configSerivce: ConfigService,
   ) {}
 
   //TODO: implement
-  public async getPasswords(username: string): Promise<Password[]> {
-    const searchResult = this.queryBuilder
-      .where('password.username = :username', { username })
+  public async getPasswords(id: number): Promise<Password[]> {
+    const searchResult = await this.queryBuilder
+      .where('password.userId = :userId', { userId: id })
       .getMany();
 
     return searchResult;
@@ -33,25 +35,22 @@ export class PasswordService {
     const passwordSearchResult = await this.getPasswordByWebAddress(
       passwordData.webAddress,
     );
-    const userSearchResult = await this.userDbService.getUserByLogin(
-      passwordData.username,
-    );
-    const user = this.appService.users.find(
-      user => user.username === passwordData.username,
+    const userSearchResult = await this.userDbService.getUserById(
+      passwordData.userId,
     );
     let insertResult = null;
 
-    if (!passwordSearchResult && userSearchResult && user) {
+    if (!passwordSearchResult && userSearchResult && passwordData.secret) {
       const encryptedPassword = CryptoJS.AES.encrypt(
         passwordData.password,
-        user.password,
-      );
+        this.decryptSecret(passwordData.secret),
+      ).toString();
 
       passwordData.password = encryptedPassword;
       insertResult = this.queryBuilder
         .insert()
         .into(Password)
-        .values({ ...passwordData, idUser: userSearchResult.id })
+        .values({ ...passwordData, user: userSearchResult.id })
         .execute();
     }
 
@@ -59,19 +58,15 @@ export class PasswordService {
   }
 
   public async getDecryptedPassword(query: IDecryptedPasswordQuery) {
-    const user = this.appService.users.find(
-      user => user.username === query.username,
-    );
-    const searchResult = await this.getPasswordByWebAddress(query.webAddress);
+    const searchResult = await this.getPasswordById(query.passwordId);
 
-    if (!searchResult && !user) {
+    if (!searchResult && !query.secret) {
       return false;
     }
-
     const decryptedPassword = CryptoJS.AES.decrypt(
       searchResult.password,
-      user.password,
-    );
+      this.decryptSecret(query.secret),
+    ).toString();
 
     return decryptedPassword;
   }
@@ -98,9 +93,23 @@ export class PasswordService {
     return insertResult;
   }
 
+  public decryptSecret(secret: string) {
+    const secretKey = this.configSerivce.get<string>('SECRET_KEY');
+
+    return CryptoJS.AES.decrypt(secret, secretKey).toString(CryptoJS.enc.Utf8);
+  }
+
   public async getPasswordByWebAddress(webAddress: string): Promise<Password> {
     const searchResult = this.queryBuilder
       .where('password.webAddress = :webAddress', { webAddress })
+      .getOne();
+
+    return searchResult;
+  }
+
+  public async getPasswordById(id: number): Promise<Password> {
+    const searchResult = this.queryBuilder
+      .where('password.id = :id', { id })
       .getOne();
 
     return searchResult;

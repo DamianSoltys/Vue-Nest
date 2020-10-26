@@ -9,6 +9,8 @@ export class PasswordService {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
+    passwordData.secret = userService.getSecret();
+
     const raw = JSON.stringify(passwordData);
     const requestOptions: RequestInit = {
       method: "POST",
@@ -26,7 +28,7 @@ export class PasswordService {
     return request;
   }
 
-  public getPasswords(username: string): IPasswordData[] {
+  public getPasswords(): IPasswordData[] {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
     const requestOptions: RequestInit = {
@@ -34,17 +36,17 @@ export class PasswordService {
       headers: myHeaders
     };
     const data: any = fetch(
-      `http://localhost:3000/locker?username=${username}`,
+      `http://localhost:3000/locker?userId=${userService.getUserId()}`,
       requestOptions
     )
-      .then(response => response.text())
+      .then(response => response.json())
       .then(result => result)
       .catch(error => console.log("error", error));
 
     return data;
   }
 
-  public getDecryptedPassword(username: string, webAddress: string) {
+  public getDecryptedPassword(userId: string, passwordId: string) {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
     const requestOptions: RequestInit = {
@@ -52,10 +54,10 @@ export class PasswordService {
       headers: myHeaders
     };
     const data = fetch(
-      `http://localhost:3000/locker/decrypt?username=${username}?webAddress=${webAddress}`,
+      `http://localhost:3000/locker/decrypt?userId=${userId}?passwordId=${passwordId}?secret=${userService.getSecret()}`,
       requestOptions
     )
-      .then(response => response.text())
+      .then(response => response.json())
       .then(result => result)
       .catch(error => console.log("error", error));
 

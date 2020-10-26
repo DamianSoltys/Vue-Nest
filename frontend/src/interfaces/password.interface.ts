@@ -1,5 +1,6 @@
 export interface IPasswordData {
-  username: string;
+  secret: string | null;
+  userId: number;
   webAddress: string;
   login: string;
   password: string;
@@ -7,7 +8,15 @@ export interface IPasswordData {
 }
 
 export interface IChangePasswordData {
-  username: string;
+  userId: string;
   password: string;
   changePassword: string;
+}
+
+export interface IPasswordsList {
+  description: string;
+  id: number;
+  login: string;
+  username: string;
+  webAddress: string;
 }

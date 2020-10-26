@@ -24,7 +24,7 @@ export class UserService {
       .catch(error => console.log("error", error));
 
     if (request?.accessToken) {
-      this.saveLoginData(request.accessToken, request.username);
+      this.saveLoginData(request);
     }
 
     return request;
@@ -55,7 +55,7 @@ export class UserService {
   public async changePassword(passwordData: IChangePasswordData): Promise<any> {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
+    myHeaders.append("Authorization", `Bearer ${this.getToken()}`);
     const raw = JSON.stringify(passwordData);
     const requestOptions: RequestInit = {
       method: "PUT",
@@ -100,9 +100,21 @@ export class UserService {
   }
 
   //TODO: improve
-  private saveLoginData(token: string, username: string) {
-    localStorage.setItem("token", token);
-    localStorage.setItem("username", username);
+  public getSecret() {
+    return localStorage.getItem("secret");
+  }
+
+  //TODO: improve
+  public getUserId() {
+    return localStorage.getItem("userId");
+  }
+
+  //TODO: improve
+  private saveLoginData(request: ILoginResponse) {
+    localStorage.setItem("token", request.accessToken);
+    localStorage.setItem("username", request.username);
+    localStorage.setItem("secret", request.secretToken);
+    localStorage.setItem("userId", request.userId.toString());
   }
 }
 

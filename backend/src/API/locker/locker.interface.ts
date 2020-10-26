@@ -1,4 +1,5 @@
 export interface IDecryptedPasswordQuery {
-  username: string;
-  webAddress: string;
+  userId: number;
+  passwordId: number;
+  secret: string;
 }

@@ -1,6 +1,10 @@
 <template>
   <div>
-    list
+    <div v-for="password of state.passwords" :key="password.id">
+      {{ password.webAddress }}
+    </div>
+
+    <button @click="tt()">cc</button>
   </div>
 </template>
 
@@ -10,7 +14,7 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { IInitalState } from "../../store/store.interface";
 
@@ -19,10 +23,17 @@ export default defineComponent({
     const store = useStore();
     const storeState: IInitalState = store.state;
     const state = reactive({
-      data: 0
+      passwords: computed(() => storeState.passwords)
     });
 
-    return { state };
+    onMounted(() => {
+      store.dispatch("GET_PASSWORDS");
+    });
+
+    function tt() {
+      console.log(state.passwords);
+    }
+    return { state, tt };
   }
 });
 </script>

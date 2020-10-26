@@ -66,11 +66,11 @@ export default defineComponent({
 
     const storeState: IInitalState = store.state;
     const state = reactive({
-      username: computed(() => storeState.username)
+      userId: computed(() => storeState.userId)
     });
 
     function handleSubmit() {
-      const data = { ...form, username: state.username };
+      const data = { ...form, userId: state.userId };
 
       emit("submit-form", data);
     }

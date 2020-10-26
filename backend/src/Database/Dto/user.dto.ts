@@ -12,7 +12,7 @@ export class RegisterUserDto {
 }
 
 export class ChangePasswordDto {
-  username: string;
+  userId: number;
   password: string;
   changePassword: string;
 }

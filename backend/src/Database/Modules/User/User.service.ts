@@ -54,6 +54,14 @@ export class UserService {
     return searchResult;
   }
 
+  public async getUserById(id: number): Promise<User> {
+    const searchResult = this.queryBuilder
+      .where('user.id = :id', { id })
+      .getOne();
+
+    return searchResult;
+  }
+
   //TODO: implement
   public async loginUser({
     username,
@@ -72,7 +80,7 @@ export class UserService {
   public async changePassword(
     passwordData: ChangePasswordDto,
   ): Promise<boolean> {
-    const searchResult = await this.getUserByLogin(passwordData.username);
+    const searchResult = await this.getUserById(passwordData.userId);
 
     if (!searchResult) {
       return false;
@@ -95,7 +103,7 @@ export class UserService {
     const changeResult = this.queryBuilder
       .update(User)
       .set({ passwordHash, saltOrKey })
-      .where('username = :username', { username: searchResult.username })
+      .where('user.id = :id', { id: searchResult.id })
       .execute();
 
     if (!changeResult) {

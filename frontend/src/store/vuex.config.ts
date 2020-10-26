@@ -1,6 +1,7 @@
 import {
   IChangePasswordData,
-  IPasswordData
+  IPasswordData,
+  IPasswordsList
 } from "@/interfaces/password.interface";
 import {
   ILoginData,
@@ -15,7 +16,8 @@ import { IInitalState } from "./store.interface";
 const initialState = {
   username: "User",
   logged: false,
-  count: 1
+  passwords: [],
+  userId: null
 };
 
 async function loginUser(
@@ -33,7 +35,7 @@ async function registerUser(
   { commit, state }: ActionContext<IInitalState, IInitalState>,
   payload: IRegisterData
 ): Promise<boolean> {
-  return await userService.getTest();
+  return await userService.registerUser(payload);
 }
 
 function logoutUser({
@@ -48,6 +50,7 @@ function checkAuth({
 }: ActionContext<IInitalState, IInitalState>): boolean {
   commit("CHANGE_LOGGED", {
     username: userService.getName(),
+    userId: userService.getUserId(),
     accessToken: userService.getToken()
   });
 
@@ -59,15 +62,19 @@ async function addPassword(
   { commit, state }: ActionContext<IInitalState, IInitalState>,
   payload: IPasswordData
 ): Promise<boolean> {
-  return passwordService.addPassword(payload);
+  return await passwordService.addPassword(payload);
 }
 
 //TODO: implement
-async function getPasswords(
-  { commit, state }: ActionContext<IInitalState, IInitalState>,
-  payload: string
-): Promise<IPasswordData[]> {
-  return passwordService.getPasswords(payload);
+async function getPasswords({
+  commit,
+  state
+}: ActionContext<IInitalState, IInitalState>): Promise<IPasswordData[]> {
+  const data = await passwordService.getPasswords();
+
+  commit("SET_PASSWORDS", data);
+
+  return data;
 }
 
 //TODO: implement
@@ -83,7 +90,7 @@ async function changePassword(
   { commit, state }: ActionContext<IInitalState, IInitalState>,
   payload: IChangePasswordData
 ): Promise<boolean> {
-  return userService.changePassword(payload);
+  return await userService.changePassword(payload);
 }
 
 export default createStore({
@@ -91,13 +98,18 @@ export default createStore({
     return { ...initialState };
   },
   mutations: {
+    SET_PASSWORDS(state: IInitalState, payload: IPasswordsList[]) {
+      state.passwords = payload;
+    },
     CHANGE_LOGGED(state: IInitalState, payload: ILoginResponse) {
       state.username = payload?.username || "User";
       state.logged = !!payload?.accessToken || false;
+      state.userId = payload?.userId || null;
     },
     CLEAR_STORE(state: IInitalState) {
       state.logged = initialState.logged;
       state.username = initialState.username;
+      state.userId = initialState.userId;
     }
   },
   actions: {
@@ -119,8 +131,8 @@ export default createStore({
     ADD_PASSWORD(context, payload) {
       return addPassword(context, payload);
     },
-    GET_PASSWORDS(context, payload) {
-      return getPasswords(context, payload);
+    GET_PASSWORDS(context) {
+      return getPasswords(context);
     },
     DECRYPT_PASSWORD(context, payload) {
       return getDecryptedPassword(context, payload);

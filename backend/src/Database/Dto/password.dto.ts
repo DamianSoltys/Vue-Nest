@@ -1,5 +1,6 @@
 export class PasswordDto {
-  username: string;
+  secret: string;
+  userId: number;
   webAddress: string;
   login: string;
   password: string;

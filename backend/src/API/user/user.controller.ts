@@ -30,6 +30,7 @@ export class UserController {
   @Post('login')
   async loginUser(
     @Body() loginData: LoginUserDto,
+    @Session() session: { password: string },
     @Request() req,
   ): Promise<{ accessToken: string }> {
     try {
@@ -37,11 +38,10 @@ export class UserController {
 
       if (status) {
         this.appService.users.push(loginData);
+        session.password = loginData.password;
       }
 
-      console.log(this.appService.users);
-
-      return this.authService.login(req.user);
+      return this.authService.login(req.user, loginData.password);
     } catch {
       throw new HttpException(
         {

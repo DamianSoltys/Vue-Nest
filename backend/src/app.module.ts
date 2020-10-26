@@ -6,8 +6,6 @@ import { UserControllerModule } from './api/user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MysqlModule } from './database/configuration/mysql.module';
-import { AuthModule } from './shared/auth/auth.module';
-import { AuthService } from './shared/auth/auth.service';
 
 @Module({
   imports: [
@@ -16,6 +14,9 @@ import { AuthService } from './shared/auth/auth.service';
     MysqlModule,
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    SessionModule.forRoot({
+      session: { secret: 'teste', resave: false, saveUninitialized: true },
     }),
   ],
   controllers: [AppController],

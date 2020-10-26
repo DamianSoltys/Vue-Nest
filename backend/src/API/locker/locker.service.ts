@@ -7,8 +7,8 @@ import { IDecryptedPasswordQuery } from './locker.interface';
 export class LockerService {
   constructor(private passwordDbService: PasswordService) {}
 
-  public getPasswordsFromDatabase(username: string) {
-    return this.passwordDbService.getPasswords(username);
+  public getPasswordsFromDatabase(id: number) {
+    return this.passwordDbService.getPasswords(id);
   }
 
   public addPasswordToDatabase(passwordData: PasswordDto) {

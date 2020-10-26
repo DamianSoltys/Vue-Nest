@@ -6,23 +6,20 @@ export class Password {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @ManyToOne(
     () => User,
     user => user.id,
   )
-  idUser: number;
+  user: number;
 
   @Column()
-  web_address: string;
+  webAddress: string;
 
   @Column({ length: 100 })
   description: string;
-
-  @Column()
-  username: string;
 
   @Column()
   login: string;
