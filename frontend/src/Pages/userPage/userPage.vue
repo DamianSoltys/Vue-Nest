@@ -1,10 +1,10 @@
 <template>
-  <div>witam</div>
+  <router-view></router-view>
 </template>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import "homePage.style.scss";
+@import "userPage.style.scss";
 </style>
 
 <script lang="ts">

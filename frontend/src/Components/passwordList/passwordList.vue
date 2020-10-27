@@ -16,7 +16,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
-import { IInitalState } from "../../store/store.interface";
+import { IInitalState, StoreActions } from "../../store/store.interface";
 
 export default defineComponent({
   setup(props, { emit }) {
@@ -27,7 +27,7 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      store.dispatch("GET_PASSWORDS");
+      store.dispatch(StoreActions.GET_PASSWORDS);
     });
 
     function tt() {

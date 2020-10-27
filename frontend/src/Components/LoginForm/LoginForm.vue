@@ -34,10 +34,10 @@
 <script lang="ts">
 import { defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
-import { IInitalState } from "../../store/store.interface";
+import { IInitalState, StoreActions } from "../../store/store.interface";
 
 export default defineComponent({
-  setup(props, { emit }) {
+  setup() {
     const store = useStore();
     const form = reactive({
       username: "",
@@ -45,7 +45,7 @@ export default defineComponent({
     });
 
     function handleSubmit() {
-      emit("submit-form", form);
+      store.dispatch(StoreActions.LOGIN_USER, form);
     }
 
     return { form, handleSubmit };

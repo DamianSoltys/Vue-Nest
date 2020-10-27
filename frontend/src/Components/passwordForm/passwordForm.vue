@@ -52,7 +52,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
-import { IInitalState } from "../../store/store.interface";
+import { IInitalState, StoreActions } from "../../store/store.interface";
 
 export default defineComponent({
   setup(props, { emit }) {
@@ -72,7 +72,7 @@ export default defineComponent({
     function handleSubmit() {
       const data = { ...form, userId: state.userId };
 
-      emit("submit-form", data);
+      store.dispatch(StoreActions.ADD_PASSWORD, data);
     }
 
     return { form, state, handleSubmit };

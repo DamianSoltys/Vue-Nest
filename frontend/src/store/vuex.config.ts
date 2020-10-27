@@ -11,7 +11,7 @@ import {
 import { passwordService } from "@/services/password.service";
 import { userService } from "@/services/user.service";
 import { Action, ActionContext, createStore, Store } from "vuex";
-import { IInitalState } from "./store.interface";
+import { IInitalState, StoreMutations, StoreActions } from "./store.interface";
 
 const initialState = {
   username: "User",
@@ -26,7 +26,7 @@ async function loginUser(
 ): Promise<ILoginResponse> {
   const data = await userService.loginUser(payload);
 
-  commit("CHANGE_LOGGED", data);
+  commit(StoreMutations.CHANGE_LOGGED, data);
 
   return data;
 }
@@ -41,14 +41,14 @@ async function registerUser(
 function logoutUser({
   commit
 }: ActionContext<IInitalState, IInitalState>): boolean {
-  commit("CLEAR_STORE");
+  commit(StoreMutations.CLEAR_STORE);
   return userService.logoutUser();
 }
 
 function checkAuth({
   commit
 }: ActionContext<IInitalState, IInitalState>): boolean {
-  commit("CHANGE_LOGGED", {
+  commit(StoreMutations.CHANGE_LOGGED, {
     username: userService.getName(),
     userId: userService.getUserId(),
     accessToken: userService.getToken()
@@ -72,7 +72,7 @@ async function getPasswords({
 }: ActionContext<IInitalState, IInitalState>): Promise<IPasswordData[]> {
   const data = await passwordService.getPasswords();
 
-  commit("SET_PASSWORDS", data);
+  commit(StoreMutations.SET_PASSWORDS, data);
 
   return data;
 }
@@ -98,44 +98,39 @@ export default createStore({
     return { ...initialState };
   },
   mutations: {
-    SET_PASSWORDS(state: IInitalState, payload: IPasswordsList[]) {
+    [StoreMutations.SET_PASSWORDS]: (
+      state: IInitalState,
+      payload: IPasswordsList[]
+    ) => {
       state.passwords = payload;
     },
-    CHANGE_LOGGED(state: IInitalState, payload: ILoginResponse) {
+    [StoreMutations.CHANGE_LOGGED]: (
+      state: IInitalState,
+      payload: ILoginResponse
+    ) => {
       state.username = payload?.username || "User";
       state.logged = !!payload?.accessToken || false;
       state.userId = payload?.userId || null;
     },
-    CLEAR_STORE(state: IInitalState) {
+    [StoreMutations.CLEAR_STORE]: (state: IInitalState) => {
       state.logged = initialState.logged;
       state.username = initialState.username;
       state.userId = initialState.userId;
     }
   },
   actions: {
-    CHECK_AUTH(context) {
-      return checkAuth(context);
-    },
-    LOGIN_USER(context, payload) {
-      return loginUser(context, payload);
-    },
-    LOGOUT_USER(context) {
-      return logoutUser(context);
-    },
-    REGISTER_USER(context, payload) {
-      return registerUser(context, payload);
-    },
-    CHANGE_PASSWORD(context, payload) {
-      return changePassword(context, payload);
-    },
-    ADD_PASSWORD(context, payload) {
-      return addPassword(context, payload);
-    },
-    GET_PASSWORDS(context) {
-      return getPasswords(context);
-    },
-    DECRYPT_PASSWORD(context, payload) {
-      return getDecryptedPassword(context, payload);
-    }
+    [StoreActions.CHECK_AUTH]: context => checkAuth(context),
+    [StoreActions.LOGIN_USER]: (context, payload) =>
+      loginUser(context, payload),
+    [StoreActions.LOGOUT_USER]: context => logoutUser(context),
+    [StoreActions.REGISTER_USER]: (context, payload) =>
+      registerUser(context, payload),
+    [StoreActions.CHANGE_PASSWORD]: (context, payload) =>
+      changePassword(context, payload),
+    [StoreActions.ADD_PASSWORD]: (context, payload) =>
+      addPassword(context, payload),
+    [StoreActions.GET_PASSWORDS]: context => getPasswords(context),
+    [StoreActions.DECRYPT_PASSWORD]: (context, payload) =>
+      getDecryptedPassword(context, payload)
   }
 });

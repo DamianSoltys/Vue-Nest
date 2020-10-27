@@ -63,10 +63,10 @@
 <script lang="ts">
 import { defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
-import { IInitalState } from "../../store/store.interface";
+import { IInitalState, StoreActions } from "../../store/store.interface";
 
 export default defineComponent({
-  setup(props, { emit }) {
+  setup() {
     const store = useStore();
     const form = reactive({
       username: "",
@@ -75,15 +75,6 @@ export default defineComponent({
       algorithmType: "HMAC"
     });
 
-    const storeState: IInitalState = store.state;
-    const state = reactive({
-      data: 0
-    });
-
-    function handleClick() {
-      state.data += 1;
-    }
-
     function handleSubmit() {
       const data = {
         username: form.username,
@@ -91,10 +82,10 @@ export default defineComponent({
         algorithmType: form.algorithmType
       };
 
-      emit("submit-form", data);
+      store.dispatch(StoreActions.REGISTER_USER, data);
     }
 
-    return { form, state, handleClick, handleSubmit };
+    return { form, handleSubmit };
   }
 });
 </script>
