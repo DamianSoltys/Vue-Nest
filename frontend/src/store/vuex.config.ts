@@ -131,6 +131,8 @@ export default createStore({
       addPassword(context, payload),
     [StoreActions.GET_PASSWORDS]: context => getPasswords(context),
     [StoreActions.DECRYPT_PASSWORD]: (context, payload) =>
-      getDecryptedPassword(context, payload)
+      getDecryptedPassword(context, payload),
+    [StoreActions.RESPONSE_ERROR]: () => {},
+    [StoreActions.RESPONSE_SUCCESS]: () => {}
   }
 });
