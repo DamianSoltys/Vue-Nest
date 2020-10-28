@@ -58,16 +58,19 @@ export class PasswordService {
   }
 
   public async getDecryptedPassword(query: IDecryptedPasswordQuery) {
-    const searchResult = await this.getPasswordById(query.passwordId);
-
+    const searchResult = await this.getPasswordById(query.passwordId, true);
+    console.log(query);
     if (!searchResult && !query.secret) {
       return false;
     }
+
+    console.log(searchResult.password);
+
     const decryptedPassword = CryptoJS.AES.decrypt(
       searchResult.password,
       this.decryptSecret(query.secret),
-    ).toString();
-
+    ).toString(CryptoJS.enc.Utf8);
+    console.log(decryptedPassword);
     return decryptedPassword;
   }
 
@@ -107,10 +110,16 @@ export class PasswordService {
     return searchResult;
   }
 
-  public async getPasswordById(id: number): Promise<Password> {
-    const searchResult = this.queryBuilder
-      .where('password.id = :id', { id })
-      .getOne();
+  public async getPasswordById(
+    id: number,
+    withPassword?: boolean,
+  ): Promise<Password> {
+    const searchResult = withPassword
+      ? this.queryBuilder
+          .where('password.id = :id', { id })
+          .addSelect('Password.password')
+          .getOne()
+      : this.queryBuilder.where('password.id = :id', { id }).getOne();
 
     return searchResult;
   }

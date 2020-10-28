@@ -46,7 +46,7 @@ export class PasswordService {
     return data;
   }
 
-  public getDecryptedPassword(userId: string, passwordId: string) {
+  public getDecryptedPassword(passwordId: string) {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
     const requestOptions: RequestInit = {
@@ -54,7 +54,7 @@ export class PasswordService {
       headers: myHeaders
     };
     const data = fetch(
-      `http://localhost:3000/locker/decrypt?userId=${userId}?passwordId=${passwordId}?secret=${userService.getSecret()}`,
+      `http://localhost:3000/locker/decrypt?userId=${userService.getUserId()}&passwordId=${passwordId}&secret=${userService.getSecret()}`,
       requestOptions
     )
       .then(response => response.json())

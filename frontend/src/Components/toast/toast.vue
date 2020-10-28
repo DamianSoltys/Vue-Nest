@@ -1,5 +1,5 @@
 <template>
-  <div style="position: absolute; top: 10px; right: 10px; min-width:200px;">
+  <div class="toast-container">
     <div
       class="toast d-flex align-items-center text-white border-0"
       v-bind:class="{
@@ -72,6 +72,7 @@ export default defineComponent({
     onUnmounted(() => {
       state.unsubscribe();
     });
+
     return { state, IResponseType };
   }
 });

@@ -82,7 +82,7 @@ async function getDecryptedPassword(
   { commit, state }: ActionContext<IInitalState, IInitalState>,
   payload: string
 ): Promise<boolean> {
-  return true;
+  return await passwordService.getDecryptedPassword(payload);
 }
 
 //TODO: implement

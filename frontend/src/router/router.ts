@@ -80,7 +80,11 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   if (!to.fullPath.includes("guest") && !store.state.logged)
     next({ name: "GuestPage" });
-  else next();
+
+  if (to.fullPath.includes("guest") && store.state.logged)
+    next({ name: "HomePage" });
+
+  next();
 });
 
 export default router;

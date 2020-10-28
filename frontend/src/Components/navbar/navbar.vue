@@ -1,7 +1,10 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">BSI Locker App</a>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div
+      class="collapse navbar-collapse ml-5 navbar-container justify-content-between"
+      id="navbarNavAltMarkup"
+    >
       <div class="navbar-nav">
         <template v-if="!state.logged">
           <li class="nav-item">
@@ -36,9 +39,11 @@
               Wyloguj
             </router-link>
           </li>
-          <a class="navbar-brand" href="#">{{ state.username }}</a>
         </template>
       </div>
+      <router-link class="navbar-brand" v-if="state.logged" to="/home">{{
+        state.username
+      }}</router-link>
     </div>
   </nav>
 </template>

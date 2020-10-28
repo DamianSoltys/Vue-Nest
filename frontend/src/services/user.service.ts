@@ -4,6 +4,7 @@ import {
   ILoginResponse,
   IRegisterData
 } from "@/interfaces/User.interface";
+import router from "@/router/router";
 
 export class UserService {
   public async loginUser(userData: ILoginData): Promise<ILoginResponse> {
@@ -25,6 +26,7 @@ export class UserService {
 
     if (request?.accessToken) {
       this.saveLoginData(request);
+      router.push("/home");
     }
 
     return request;

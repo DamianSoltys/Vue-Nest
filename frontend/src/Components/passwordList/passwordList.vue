@@ -1,10 +1,33 @@
 <template>
-  <div>
-    <div v-for="password of state.passwords" :key="password.id">
-      {{ password.webAddress }}
+  <div class="d-flex mt-2">
+    <div class="container">
+      <div
+        class="row m-2"
+        v-for="password of state.passwords"
+        :key="password.id"
+      >
+        <div class="col-sm">
+          {{ password.id }}
+        </div>
+        <div class="col-sm">
+          {{ password.login }}
+        </div>
+        <div class="col-sm">
+          {{ password.webAddress }}
+        </div>
+        <div class="col-sm">
+          {{ "*********" }}
+        </div>
+        <div class="col-sm">
+          <button
+            class="btn btn-primary w-100"
+            @click="showDecryptedPassword(password.id)"
+          >
+            cc
+          </button>
+        </div>
+      </div>
     </div>
-
-    <button @click="tt()">cc</button>
   </div>
 </template>
 
@@ -30,10 +53,13 @@ export default defineComponent({
       store.dispatch(StoreActions.GET_PASSWORDS);
     });
 
-    function tt() {
-      console.log(state.passwords);
+    function showDecryptedPassword(passwordId: string) {
+      store.dispatch(StoreActions.DECRYPT_PASSWORD, passwordId).then(data => {
+        console.log(data);
+      });
     }
-    return { state, tt };
+
+    return { state, showDecryptedPassword };
   }
 });
 </script>

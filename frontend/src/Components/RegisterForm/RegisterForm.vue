@@ -13,7 +13,7 @@
       <div class="form-section m-2">
         <label class="form-label" for="password">Hasło:</label>
         <input
-          type="text"
+          type="password"
           class="form-control"
           name="password"
           v-model="form.password"
@@ -22,7 +22,7 @@
       <div class="form-section m-2">
         <label class="form-label" for="passwordConfirm">Potwierdź hasło:</label>
         <input
-          type="text"
+          type="password"
           class="form-control"
           name="passwordConfirm"
           v-model="form.passwordConfirm"
