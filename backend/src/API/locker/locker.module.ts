@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { PasswordDBModule } from 'src/database/modules/Password/password.module';
+import { QueryModule } from 'src/database/modules/shared/query.module';
 import { LockerController } from './locker.controller';
 import { LockerService } from './locker.service';
 
 @Module({
-  imports: [PasswordDBModule],
+  imports: [PasswordDBModule, QueryModule],
   controllers: [LockerController],
   providers: [LockerService],
 })

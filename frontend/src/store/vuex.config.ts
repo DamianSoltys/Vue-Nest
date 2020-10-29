@@ -81,7 +81,7 @@ async function getPasswords({
 async function getDecryptedPassword(
   { commit, state }: ActionContext<IInitalState, IInitalState>,
   payload: string
-): Promise<boolean> {
+): Promise<string> {
   return await passwordService.getDecryptedPassword(payload);
 }
 

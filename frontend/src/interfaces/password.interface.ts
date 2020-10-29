@@ -10,7 +10,7 @@ export interface IPasswordData {
 export interface IChangePasswordData {
   userId: string;
   password: string;
-  changePassword: string;
+  oldPassword: string;
 }
 
 export interface IPasswordsList {
@@ -19,4 +19,5 @@ export interface IPasswordsList {
   login: string;
   username: string;
   webAddress: string;
+  password?: string | null;
 }

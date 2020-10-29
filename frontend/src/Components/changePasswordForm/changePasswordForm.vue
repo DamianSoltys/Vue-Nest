@@ -2,7 +2,16 @@
   <div>
     <form>
       <div class="form-section m-2">
-        <label class="form-label" for="password">Hasło:</label>
+        <label class="form-label" for="oldPassword">Aktualne hasło:</label>
+        <input
+          type="password"
+          class="form-control"
+          name="oldPassword"
+          v-model="form.oldPassword"
+        />
+      </div>
+      <div class="form-section m-2">
+        <label class="form-label" for="password">Nowe hasło:</label>
         <input
           type="password"
           class="form-control"
@@ -11,7 +20,7 @@
         />
       </div>
       <div class="form-section m-2">
-        <label class="form-label" for="confirmPassword">Potwierdź hasło:</label>
+        <label class="form-label" for="confirmPassword">Potwierdz hasło:</label>
         <input
           type="password"
           class="form-control"
@@ -20,7 +29,7 @@
         />
       </div>
       <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">
-        Zaloguj
+        Zmień hasło
       </button>
     </form>
   </div>
@@ -32,20 +41,31 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
+import { IChangePasswordData } from "../../interfaces/password.interface";
 import { IInitalState, StoreActions } from "../../store/store.interface";
 
 export default defineComponent({
   setup() {
     const store = useStore();
+    const state = reactive({
+      userId: computed(() => store.state.userId)
+    });
     const form = reactive({
       password: "",
+      oldPassword: "",
       confirmPassword: ""
     });
 
     function handleSubmit() {
-      store.dispatch(StoreActions.LOGIN_USER, form);
+      const data: IChangePasswordData = {
+        password: form.password,
+        oldPassword: form.oldPassword,
+        userId: state.userId
+      };
+
+      store.dispatch(StoreActions.CHANGE_PASSWORD, data);
     }
 
     return { form, handleSubmit };

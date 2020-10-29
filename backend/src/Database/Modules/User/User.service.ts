@@ -9,6 +9,8 @@ import {
 } from 'src/database/dto/user.dto';
 import { ConfigService } from '@nestjs/config';
 import { AlgorithmTypeEnum } from 'src/database/constants/algorithmType.const';
+import { QueryService } from '../shared/query.service';
+import { Password } from 'src/database/entities/password.entity';
 var CryptoJS = require('crypto-js');
 
 @Injectable()
@@ -19,6 +21,7 @@ export class UserService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private configSerivce: ConfigService,
+    private queryService: QueryService,
   ) {}
 
   //TODO: implement
@@ -32,7 +35,7 @@ export class UserService {
       password,
     );
 
-    const searchResult = await this.getUserByLogin(username);
+    const searchResult = await this.queryService.getUserByLogin(username);
     let insertResult = null;
 
     if (!searchResult) {
@@ -46,28 +49,12 @@ export class UserService {
     return insertResult;
   }
 
-  public async getUserByLogin(username: string): Promise<User> {
-    const searchResult = this.queryBuilder
-      .where('user.username = :username', { username })
-      .getOne();
-
-    return searchResult;
-  }
-
-  public async getUserById(id: number): Promise<User> {
-    const searchResult = this.queryBuilder
-      .where('user.id = :id', { id })
-      .getOne();
-
-    return searchResult;
-  }
-
   //TODO: implement
   public async loginUser({
     username,
     password,
   }: LoginUserDto): Promise<boolean> {
-    const searchResult = await this.getUserByLogin(username);
+    const searchResult = await this.queryService.getUserByLogin(username);
 
     if (!searchResult) {
       return false;
@@ -79,38 +66,66 @@ export class UserService {
   //TODO: add try catch implement changing all passwords
   public async changePassword(
     passwordData: ChangePasswordDto,
-  ): Promise<boolean> {
-    const searchResult = await this.getUserById(passwordData.userId);
+  ): Promise<string> {
+    const searchResult = await this.queryService.getUserById(
+      passwordData.userId,
+    );
 
     if (!searchResult) {
-      return false;
+      return null;
     }
 
     const comparePassword = this.comparePassword(
       searchResult,
-      passwordData.changePassword,
+      passwordData.oldPassword,
     );
 
     if (!comparePassword) {
-      return false;
+      return null;
     }
 
     const { passwordHash, saltOrKey } = this.hashPassword(
       searchResult.algorithmType,
-      passwordData.changePassword,
+      passwordData.password,
     );
 
-    const changeResult = this.queryBuilder
+    const changeResult = await this.queryBuilder
       .update(User)
       .set({ passwordHash, saltOrKey })
-      .where('user.id = :id', { id: searchResult.id })
+      .where('User.id = :id', { id: searchResult.id })
       .execute();
 
     if (!changeResult) {
-      return false;
+      return null;
     }
 
-    return true;
+    const passwords = await this.queryService.getPasswords(
+      searchResult.id,
+      true,
+    );
+
+    passwords.forEach(passwordRow => {
+      const decryptOldPassword = CryptoJS.AES.decrypt(
+        passwordRow.password,
+        passwordData.oldPassword,
+      ).toString(CryptoJS.enc.Utf8);
+
+      const password = CryptoJS.AES.encrypt(
+        decryptOldPassword,
+        passwordData.password,
+      ).toString();
+
+      this.queryBuilder
+        .update(Password)
+        .set({ password })
+        .where('password.id = :id', { id: passwordRow.id })
+        .execute();
+    });
+
+    const key = this.configSerivce.get<string>('SECRET_KEY');
+    const secret = CryptoJS.AES.encrypt(passwordData.password, key).toString();
+
+    return secret;
   }
 
   public hashPassword(algorithmType: AlgorithmTypeEnum, password: string) {

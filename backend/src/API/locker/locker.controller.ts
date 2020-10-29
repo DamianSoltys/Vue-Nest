@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpException,
   HttpStatus,
   Post,
@@ -35,9 +36,9 @@ export class LockerController {
   }
 
   @Get()
-  getPasswords(@Query('userId') id: number) {
+  async getPasswords(@Query('userId') id: number) {
     try {
-      return this.lockerService.getPasswordsFromDatabase(id);
+      return await this.lockerService.getPasswordsFromDatabase(id);
     } catch {
       throw new HttpException(
         {
@@ -50,9 +51,13 @@ export class LockerController {
   }
 
   @Get('decrypt')
-  async getDecryptedPassword(@Query() query: IDecryptedPasswordQuery) {
+  async getDecryptedPassword(
+    @Query() query: IDecryptedPasswordQuery,
+    @Headers('Secret') secret: string,
+  ) {
     try {
-      return this.lockerService.getDecryptedPasswordFromDatabase(query);
+      query.secret = secret;
+      return await this.lockerService.getDecryptedPasswordFromDatabase(query);
     } catch {
       throw new HttpException(
         {

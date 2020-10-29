@@ -46,20 +46,22 @@ export class PasswordService {
     return data;
   }
 
-  public getDecryptedPassword(passwordId: string) {
+  public async getDecryptedPassword(passwordId: string) {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
+    myHeaders.append("Secret", `${userService.getSecret()}`);
     const requestOptions: RequestInit = {
       method: "GET",
       headers: myHeaders
     };
-    const data = fetch(
-      `http://localhost:3000/locker/decrypt?userId=${userService.getUserId()}&passwordId=${passwordId}&secret=${userService.getSecret()}`,
+
+    const data = await fetch(
+      `http://localhost:3000/locker/decrypt?userId=${userService.getUserId()}&passwordId=${passwordId}}`,
       requestOptions
     )
-      .then(response => response.json())
+      .then(response => response.text())
       .then(result => result)
-      .catch(error => console.log("error", error));
+      .catch(error => error);
 
     return data;
   }

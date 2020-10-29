@@ -7,6 +7,7 @@ import AddPasswordComponent from "../components/passwordForm/passwordForm.vue";
 import PasswordListComponent from "../components/passwordList/passwordList.vue";
 import RegisterFormComponent from "../components/registerForm/registerForm.vue";
 import LoginFormComponent from "../components/loginForm/loginForm.vue";
+import ChangePasswordFormComponent from "../components/changePasswordForm/changePasswordForm.vue";
 import AppLayout from "../App.vue";
 import store from "../store/vuex.config";
 import { IInitalState } from "@/store/store.interface";
@@ -66,7 +67,7 @@ const routes = [
       {
         path: "change-password",
         name: "ChangePasswordForm",
-        component: HomePageComponent
+        component: ChangePasswordFormComponent
       }
     ]
   }

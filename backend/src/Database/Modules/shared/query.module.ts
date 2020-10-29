@@ -4,13 +4,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppService } from 'src/app.service';
 import { Password } from 'src/database/entities/password.entity';
 import { User } from 'src/database/entities/user.entity';
-import { QueryService } from '../shared/query.service';
+import { QueryService } from './query.service';
 import { UserService } from '../user/user.service';
-import { PasswordService } from './password.service';
+import { PasswordService } from '../password/password.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Password, User]), ConfigModule],
-  providers: [PasswordService, QueryService],
-  exports: [TypeOrmModule, PasswordService],
+  providers: [QueryService],
+  exports: [QueryService],
 })
-export class PasswordDBModule {}
+export class QueryModule {}

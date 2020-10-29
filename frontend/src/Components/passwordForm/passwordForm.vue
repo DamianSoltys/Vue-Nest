@@ -37,7 +37,10 @@
           v-model="form.description"
         />
       </div>
-      <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">
+      <button
+        class="btn btn-primary w-100"
+        @click.prevent.once="handleSubmit()"
+      >
         Dodaj hasło
       </button>
     </form>

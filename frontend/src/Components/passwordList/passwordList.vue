@@ -16,14 +16,14 @@
           {{ password.webAddress }}
         </div>
         <div class="col-sm">
-          {{ "*********" }}
+          {{ password.password ? password.password : "*********" }}
         </div>
         <div class="col-sm">
           <button
             class="btn btn-primary w-100"
             @click="showDecryptedPassword(password.id)"
           >
-            cc
+            {{ password.password ? "Ukryj" : "Zobacz" }}
           </button>
         </div>
       </div>
@@ -53,10 +53,26 @@ export default defineComponent({
       store.dispatch(StoreActions.GET_PASSWORDS);
     });
 
-    function showDecryptedPassword(passwordId: string) {
+    function getDecrytedData(passwordId: number) {
       store.dispatch(StoreActions.DECRYPT_PASSWORD, passwordId).then(data => {
-        console.log(data);
+        if (data) {
+          state.passwords.map(password => {
+            if (password.id === passwordId) {
+              return (password.password = data);
+            } else {
+              return (password.password = null);
+            }
+          });
+        }
       });
+    }
+
+    function showDecryptedPassword(passwordId: number) {
+      const isDecrypted = state.passwords.find(
+        password => password.id == passwordId && password.password
+      );
+
+      isDecrypted ? (isDecrypted.password = null) : getDecrytedData(passwordId);
     }
 
     return { state, showDecryptedPassword };

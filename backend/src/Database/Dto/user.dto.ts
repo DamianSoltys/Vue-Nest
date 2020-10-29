@@ -13,6 +13,6 @@ export class RegisterUserDto {
 
 export class ChangePasswordDto {
   userId: number;
+  oldPassword: string;
   password: string;
-  changePassword: string;
 }

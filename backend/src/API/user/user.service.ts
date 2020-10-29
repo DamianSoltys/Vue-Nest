@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { LoginUserDto, RegisterUserDto } from 'src/database/dto/user.dto';
+import {
+  ChangePasswordDto,
+  LoginUserDto,
+  RegisterUserDto,
+} from 'src/database/dto/user.dto';
 import { UserService } from 'src/database/modules/user/user.service';
 
 @Injectable()
@@ -16,5 +20,13 @@ export class UserControllerService {
     const databaseResponse = await this.userDBService.loginUser(userData);
 
     return databaseResponse ? true : false;
+  }
+
+  async changePassword(passwordData: ChangePasswordDto): Promise<string> {
+    const databaseResponse = await this.userDBService.changePassword(
+      passwordData,
+    );
+
+    return databaseResponse;
   }
 }

@@ -8,10 +8,15 @@ import {
   Session,
   UseGuards,
   Request,
+  Put,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AppService } from 'src/app.service';
-import { LoginUserDto, RegisterUserDto } from 'src/database/dto/user.dto';
+import {
+  ChangePasswordDto,
+  LoginUserDto,
+  RegisterUserDto,
+} from 'src/database/dto/user.dto';
 import { AuthService } from 'src/shared/auth/auth.service';
 import { JwtAuthGuard } from 'src/shared/auth/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/shared/auth/local-auth.guard';
@@ -57,6 +62,23 @@ export class UserController {
   async registerUser(@Body() registerData: RegisterUserDto): Promise<boolean> {
     try {
       return this.userService.registerUser(registerData);
+    } catch {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something went wrong, try again later',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Put('password')
+  async changePassword(
+    @Body() passwordData: ChangePasswordDto,
+  ): Promise<string> {
+    try {
+      return this.userService.changePassword(passwordData);
     } catch {
       throw new HttpException(
         {

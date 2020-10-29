@@ -64,13 +64,20 @@ export class UserService {
       headers: myHeaders,
       body: raw
     };
-    const request: any = await fetch(
-      "http://localhost:3000/user/locker",
+    const request: string | void = await fetch(
+      "http://localhost:3000/user/password",
       requestOptions
     )
-      .then(response => response.json())
+      .then(response => response.text())
       .then(result => result)
       .catch(error => console.log("error", error));
+
+    if (request) {
+      const data: ILoginResponse = { secretToken: request };
+
+      this.saveLoginData(data);
+      router.push("/home");
+    }
 
     return request;
   }
@@ -113,10 +120,18 @@ export class UserService {
 
   //TODO: improve
   private saveLoginData(request: ILoginResponse) {
-    localStorage.setItem("token", request.accessToken);
-    localStorage.setItem("username", request.username);
-    localStorage.setItem("secret", request.secretToken);
-    localStorage.setItem("userId", request.userId.toString());
+    request?.accessToken
+      ? localStorage.setItem("token", request.accessToken)
+      : null;
+    request?.username
+      ? localStorage.setItem("username", request.username)
+      : null;
+    request?.secretToken
+      ? localStorage.setItem("secret", request.secretToken)
+      : null;
+    request?.userId?.toString()
+      ? localStorage.setItem("userId", request.userId.toString())
+      : null;
   }
 }
 
