@@ -28,6 +28,26 @@
           v-model="form.confirmPassword"
         />
       </div>
+      <div class="form-section m-2">
+        <label class="form-check-label m-2" for="algorithmTypeOne">HMAC</label>
+        <input
+          type="radio"
+          class="form-check-input m-2"
+          name="algorithmTypeOne"
+          v-model="form.algorithmType"
+          value="HMAC"
+        />
+        <label class="form-check-label m-2" for="algorithmTypeTwo"
+          >SHA512</label
+        >
+        <input
+          type="radio"
+          class="form-check-input m-2"
+          name="algorithmTypeTwo"
+          v-model="form.algorithmType"
+          value="SHA512"
+        />
+      </div>
       <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">
         Zmień hasło
       </button>
@@ -55,14 +75,16 @@ export default defineComponent({
     const form = reactive({
       password: "",
       oldPassword: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      algorithmType: "HMAC"
     });
 
     function handleSubmit() {
       const data: IChangePasswordData = {
         password: form.password,
         oldPassword: form.oldPassword,
-        userId: state.userId
+        userId: state.userId,
+        algorithmType: form.algorithmType
       };
 
       store.dispatch(StoreActions.CHANGE_PASSWORD, data);

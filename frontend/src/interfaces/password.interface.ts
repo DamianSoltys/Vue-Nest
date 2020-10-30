@@ -11,6 +11,7 @@ export interface IChangePasswordData {
   userId: string;
   password: string;
   oldPassword: string;
+  algorithmType: string;
 }
 
 export interface IPasswordsList {

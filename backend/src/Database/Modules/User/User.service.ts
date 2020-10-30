@@ -85,13 +85,17 @@ export class UserService {
     }
 
     const { passwordHash, saltOrKey } = this.hashPassword(
-      searchResult.algorithmType,
+      passwordData.algorithmType,
       passwordData.password,
     );
 
     const changeResult = await this.queryBuilder
       .update(User)
-      .set({ passwordHash, saltOrKey })
+      .set({
+        passwordHash,
+        saltOrKey,
+        algorithmType: passwordData.algorithmType,
+      })
       .where('User.id = :id', { id: searchResult.id })
       .execute();
 

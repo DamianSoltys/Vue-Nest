@@ -15,4 +15,5 @@ export class ChangePasswordDto {
   userId: number;
   oldPassword: string;
   password: string;
+  algorithmType: AlgorithmTypeEnum;
 }
