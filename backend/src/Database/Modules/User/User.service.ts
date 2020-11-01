@@ -13,6 +13,10 @@ import { QueryService } from '../shared/query.service';
 import { Password } from 'src/database/entities/password.entity';
 var CryptoJS = require('crypto-js');
 
+interface PrimesHash {
+  [index: number]: boolean;
+}
+
 @Injectable()
 export class UserService {
   private queryBuilder = this.usersRepository.createQueryBuilder();
@@ -170,5 +174,65 @@ export class UserService {
     ).toString();
 
     return passwordLoginHash === passwordHash;
+  }
+
+  //LABORATORY METHHODS
+  public createNumbersArray(limit: number): number[] {
+    return Array.from({ length: limit - 1 }, (_v, k) => k + 2);
+  }
+
+  public setToTrue(allNums: number[]): PrimesHash {
+    return allNums.reduce((hash: PrimesHash, num: number) => {
+      hash[num] = true;
+
+      return hash;
+    }, {});
+  }
+
+  public getUnmarked(primes: PrimesHash): number[] {
+    return Object.keys(primes).reduce((array: number[], key) => {
+      if (primes[+key] === true) {
+        array.push(+key);
+      }
+
+      return array;
+    }, []);
+  }
+
+  public findSmallestPrimes(
+    p: number,
+    limit: number,
+    primes: PrimesHash,
+  ): void {
+    while (p <= limit) {
+      if (primes[p] === true) {
+        // Step 3: mark off all multiples of p. We start from p*p as
+        // an optimisation
+        for (let i = p * p; i <= limit; i += p) {
+          primes[i] = false;
+        }
+      }
+      p++;
+    }
+  }
+
+  public sift(limit: number): number[] {
+    if (limit === 2) return [2];
+
+    // Step 1: create an array from 2..limit inclusive
+    let allNums: number[] = this.createNumbersArray(limit);
+
+    // Step 2: set p = smallest prime
+    let p = 2;
+
+    // create a hash of { number: boolean }, from the array created in step 1,
+    // setting every value to true
+    let primes: PrimesHash = this.setToTrue(allNums);
+
+    // Step 4: find the next smallest prime and repeat step 3
+    this.findSmallestPrimes(p, limit, primes);
+
+    // Step 5: return all unmarked numbers
+    return this.getUnmarked(primes);
   }
 }

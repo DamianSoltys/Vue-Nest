@@ -54,4 +54,86 @@ describe('UserService', () => {
       expect(userService.comparePassword(user, 'password')).toBe(true);
     });
   });
+
+  describe('Sieve of Eratosthenes', () => {
+    it('should return array of numbers', () => {
+      expect(userService.createNumbersArray(6)).toStrictEqual([2, 3, 4, 5, 6]);
+    });
+
+    it('should return empty array', () => {
+      expect(userService.createNumbersArray(0)).toStrictEqual([]);
+    });
+
+    it('should return set array to object: {"number":true} form', () => {
+      const array = userService.createNumbersArray(6);
+      const result = { '2': true, '3': true, '4': true, '5': true, '6': true };
+
+      expect(userService.setToTrue(array)).toStrictEqual(result);
+    });
+
+    it('should return object with prime numbers set as false: {"prime":false}', () => {
+      const array = userService.createNumbersArray(6);
+      const primes = userService.setToTrue(array);
+      const result = {
+        '2': true,
+        '3': true,
+        '4': false,
+        '5': true,
+        '6': false,
+      };
+      userService.findSmallestPrimes(2, 6, primes);
+
+      expect(primes).toStrictEqual(result);
+    });
+
+    it('should return empty array when limit is 0', () => {
+      expect(userService.sift(0)).toStrictEqual([]);
+    });
+
+    it('should return empty array when limit is 1', () => {
+      expect(userService.sift(1)).toStrictEqual([]);
+    });
+
+    it('should return [2] when limit is 2', () => {
+      expect(userService.sift(2)).toStrictEqual([2]);
+    });
+
+    it('should return prime numbers with limit of 6', () => {
+      const result = [2, 3, 5];
+
+      expect(userService.sift(6)).toStrictEqual(result);
+    });
+
+    it('should return prime numbers with limit of 100', () => {
+      const result = [
+        2,
+        3,
+        5,
+        7,
+        11,
+        13,
+        17,
+        19,
+        23,
+        29,
+        31,
+        37,
+        41,
+        43,
+        47,
+        53,
+        59,
+        61,
+        67,
+        71,
+        73,
+        79,
+        83,
+        89,
+        97,
+      ];
+
+      expect(userService.sift(100)).toStrictEqual(result);
+    });
+  });
 });
