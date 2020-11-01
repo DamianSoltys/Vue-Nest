@@ -4,7 +4,6 @@ import { SessionModule } from 'nestjs-session';
 import { LockerControllerModule } from './api/locker/locker.module';
 import { UserControllerModule } from './api/user/user.module';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { MysqlModule } from './database/configuration/mysql.module';
 
 @Module({
@@ -20,6 +19,5 @@ import { MysqlModule } from './database/configuration/mysql.module';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

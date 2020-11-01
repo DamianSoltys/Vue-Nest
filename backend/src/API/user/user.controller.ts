@@ -10,8 +10,6 @@ import {
   Request,
   Put,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { AppService } from 'src/app.service';
 import {
   ChangePasswordDto,
   LoginUserDto,
@@ -20,7 +18,6 @@ import {
 import { AuthService } from 'src/shared/auth/auth.service';
 import { JwtAuthGuard } from 'src/shared/auth/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/shared/auth/local-auth.guard';
-import { IUserSession } from './user.interface';
 import { UserControllerService } from './user.service';
 
 @Controller('user')
@@ -28,7 +25,6 @@ export class UserController {
   constructor(
     private readonly userService: UserControllerService,
     private readonly authService: AuthService,
-    private readonly appService: AppService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -42,7 +38,6 @@ export class UserController {
       const status = await this.userService.loginUser(loginData);
 
       if (status) {
-        this.appService.users.push(loginData);
         session.password = loginData.password;
       }
 
@@ -88,12 +83,5 @@ export class UserController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  test(): string {
-    console.log(this.appService.users);
-    return JSON.stringify('hello');
   }
 }

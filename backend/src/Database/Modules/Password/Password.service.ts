@@ -2,12 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IDecryptedPasswordQuery } from 'src/api/locker/locker.interface';
-import { AppService } from 'src/app.service';
 import { PasswordDto } from 'src/database/Dto/password.dto';
 import { Password } from 'src/database/entities/password.entity';
 import { InsertResult, Repository } from 'typeorm';
 import { QueryService } from '../shared/query.service';
-import { UserService } from '../user/user.service';
 var CryptoJS = require('crypto-js');
 
 @Injectable()
