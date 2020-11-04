@@ -1,22 +1,17 @@
-import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AlgorithmTypeEnum } from 'src/database/constants/algorithmType.const';
-import { Password } from 'src/database/entities/password.entity';
 import { User } from 'src/database/entities/user.entity';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  UserRepostioryFake,
+  PasswordRepositoryFake,
+  ConfigFakeService,
+  QueryFakeService,
+  UserFakeService,
+} from 'src/shared/mocks/class.mock';
 import { QueryService } from '../shared/query.service';
-import { UsersDBModule } from './user.module';
 import { UserService } from './user.service';
 
-class UserRepostioryFake {
-  public createQueryBuilder(): void {}
-}
-
-class PasswordRepositoryFake {
-  public createQueryBuilder(): void {}
-}
-
-describe('UserService', () => {
+describe('User service without mock service', () => {
   let userService: UserService;
 
   beforeEach(async () => {
@@ -30,9 +25,15 @@ describe('UserService', () => {
           provide: 'PasswordRepository',
           useClass: PasswordRepositoryFake,
         },
-        UserService,
-        QueryService,
-        ConfigService,
+        {
+          provide: 'ConfigService',
+          useClass: ConfigFakeService,
+        },
+        {
+          provide: 'QueryService',
+          useClass: QueryService,
+        },
+        UserService, //use real service to test password functions
       ],
       exports: [UserService],
     }).compile();
@@ -40,7 +41,7 @@ describe('UserService', () => {
     userService = moduleFixture.get<UserService>(UserService);
   });
 
-  describe('compare passwords', () => {
+  describe('Password Methods', () => {
     it('should compare two passwords and return boolean value', () => {
       const user: User = {
         id: 1,
@@ -52,6 +53,73 @@ describe('UserService', () => {
       jest.spyOn(userService, 'comparePassword').mockImplementation(() => true);
 
       expect(userService.comparePassword(user, 'password')).toBe(true);
+    });
+
+    it('should hash good password and compare it to already hashed password', () => {
+      const user: User = {
+        id: 1,
+        passwordHash:
+          '9ba1f63365a6caf66e46348f43cdef956015bea997adeb06e69007ee3ff517df10fc5eb860da3d43b82c2a040c931119d2dfc6d08e253742293a868cc2d82015',
+        username: 'test',
+        algorithmType: AlgorithmTypeEnum.HMAC,
+        saltOrKey: 'test',
+      };
+
+      expect(userService.comparePassword(user, 'test')).toBe(true);
+    });
+
+    it('should hash bad password and compare it to already hashed password', () => {
+      const user: User = {
+        id: 1,
+        passwordHash:
+          '9ba1f63365a6caf66e46348f43cdef956015bea997adeb06e69007ee3ff517df10fc5eb860da3d43b82c2a040c931119d2dfc6d08e253742293a868cc2d82015',
+        username: 'test',
+        algorithmType: AlgorithmTypeEnum.HMAC,
+        saltOrKey: 'test',
+      };
+
+      expect(userService.comparePassword(user, 'testtt')).toBe(false);
+    });
+
+    it('should return object with passwordHash and saltOrKey data', () => {
+      const hashedPassword = userService.hashPassword(
+        AlgorithmTypeEnum.HMAC,
+        'test',
+      );
+
+      expect(hashedPassword).toBeInstanceOf(Object);
+    });
+
+    it('should return object with passwordHash string data', () => {
+      const hashedPassword = userService.hashPassword(
+        AlgorithmTypeEnum.HMAC,
+        'test',
+      );
+
+      expect(typeof hashedPassword.passwordHash).toBe('string');
+    });
+
+    it('should return object with saltOrKey string data', () => {
+      const hashedPassword = userService.hashPassword(
+        AlgorithmTypeEnum.HMAC,
+        'test',
+      );
+
+      expect(typeof hashedPassword.saltOrKey).toBe('string');
+    });
+
+    it('should return two different hashes based on algorithm type', () => {
+      const SHAhashedPassword = userService.hashPassword(
+        AlgorithmTypeEnum.SHA512,
+        'test',
+      );
+
+      const HMAChashedPassword = userService.hashPassword(
+        AlgorithmTypeEnum.HMAC,
+        'test',
+      );
+
+      expect(SHAhashedPassword).not.toBe(HMAChashedPassword);
     });
   });
 
@@ -134,6 +202,79 @@ describe('UserService', () => {
       ];
 
       expect(userService.sift(100)).toStrictEqual(result);
+    });
+  });
+
+  describe('User service with mock service', () => {
+    let userService: UserService;
+
+    beforeEach(async () => {
+      const moduleFixture: TestingModule = await Test.createTestingModule({
+        providers: [
+          {
+            provide: 'UserRepository',
+            useClass: UserRepostioryFake,
+          },
+          {
+            provide: 'PasswordRepository',
+            useClass: PasswordRepositoryFake,
+          },
+          {
+            provide: 'ConfigService',
+            useClass: ConfigFakeService,
+          },
+          {
+            provide: 'QueryService',
+            useClass: QueryService,
+          },
+          {
+            provide: 'UserService',
+            useClass: UserFakeService,
+          },
+        ],
+        exports: [UserService],
+      }).compile();
+
+      userService = moduleFixture.get<UserService>(UserService);
+    });
+
+    it('should register user if there is register data', () => {
+      expect(
+        userService.registerUser({
+          username: 'test',
+          password: 'test',
+          algorithmType: AlgorithmTypeEnum.HMAC,
+        }),
+      ).resolves.toBe(true);
+    });
+
+    it('should not register user if there is not register data', () => {
+      expect(userService.registerUser(null)).rejects.toBe(false);
+    });
+
+    it('should login user if there is login data', () => {
+      expect(
+        userService.loginUser({ username: 'test', password: 'test' }),
+      ).resolves.toBe(true);
+    });
+
+    it('should not login user if there is not login data', () => {
+      expect(userService.loginUser(null)).rejects.toBe(false);
+    });
+
+    it('should change user password if there is password data', () => {
+      expect(
+        userService.changePassword({
+          password: 'test',
+          oldPassword: 'test',
+          userId: 1,
+          algorithmType: AlgorithmTypeEnum.HMAC,
+        }),
+      ).resolves.toBe(true);
+    });
+
+    it('should not change user passwordif there is not password data', () => {
+      expect(userService.changePassword(null)).rejects.toBe(false);
     });
   });
 });

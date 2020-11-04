@@ -53,7 +53,6 @@ export class UserService {
     return insertResult;
   }
 
-  //TODO: implement
   public async loginUser({
     username,
     password,
