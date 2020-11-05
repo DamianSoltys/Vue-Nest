@@ -5,15 +5,41 @@ import {
 } from 'src/database/dto/user.dto';
 import { Password } from 'src/database/entities/password.entity';
 import { User } from 'src/database/entities/user.entity';
-import { MockPassword, MockPasswords, MockUser } from './data.mock';
+import { MockPassword, MockPasswords, MockUser, MockUsers } from './data.mock';
 
 //TODO mock queryBuilder to use real functions instead faked
 export class UserRepostioryFake {
-  public createQueryBuilder(): void {}
+  public createQueryBuilder = jest.fn(() => ({
+    delete: jest.fn().mockReturnThis(),
+    from: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    execute: jest.fn().mockReturnThis(),
+    insert: jest.fn().mockReturnThis(),
+    into: jest.fn().mockReturnThis(),
+    values: jest.fn().mockReturnThis(),
+    update: jest.fn().mockReturnThis(),
+    set: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    getMany: jest.fn().mockReturnValue(MockUsers),
+    getOne: jest.fn().mockReturnValue(MockUser),
+  }));
 }
 
 export class PasswordRepositoryFake {
-  public createQueryBuilder(): void {}
+  public createQueryBuilder = jest.fn(() => ({
+    delete: jest.fn().mockReturnThis(),
+    from: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    execute: jest.fn().mockReturnThis(),
+    insert: jest.fn().mockReturnThis(),
+    into: jest.fn().mockReturnThis(),
+    values: jest.fn().mockReturnThis(),
+    update: jest.fn().mockReturnThis(),
+    set: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    getMany: jest.fn().mockReturnValue(MockPasswords),
+    getOne: jest.fn().mockReturnValue(MockPassword),
+  }));
 }
 
 export class ConfigFakeService {

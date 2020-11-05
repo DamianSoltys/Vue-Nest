@@ -29,16 +29,44 @@ describe('User service without mock service', () => {
           provide: 'ConfigService',
           useClass: ConfigFakeService,
         },
-        {
-          provide: 'QueryService',
-          useClass: QueryService,
-        },
+        QueryService,
         UserService, //use real service to test password functions
       ],
       exports: [UserService],
     }).compile();
 
     userService = moduleFixture.get<UserService>(UserService);
+  });
+
+  describe('User service methods', () => {
+    it('should not register user if there is one with the same data passed to the method', () => {
+      expect(
+        userService.registerUser({
+          username: 'test',
+          password: 'test',
+          algorithmType: AlgorithmTypeEnum.HMAC,
+        }),
+      ).resolves.toBe(null);
+    });
+
+    it('should login user if there is login data and password matches', () => {
+      expect(
+        userService.loginUser({ username: 'test', password: 'test' }),
+      ).resolves.toBe(true);
+    });
+
+    it('should change user password if there is password data and should also return new secret password', () => {
+      expect(
+        userService
+          .changePassword({
+            password: 'test',
+            oldPassword: 'test',
+            userId: 1,
+            algorithmType: AlgorithmTypeEnum.HMAC,
+          })
+          .then(data => typeof data),
+      ).resolves.toBe('string');
+    });
   });
 
   describe('Password Methods', () => {
@@ -202,79 +230,6 @@ describe('User service without mock service', () => {
       ];
 
       expect(userService.sift(100)).toStrictEqual(result);
-    });
-  });
-
-  describe('User service with mock service', () => {
-    let userService: UserService;
-
-    beforeEach(async () => {
-      const moduleFixture: TestingModule = await Test.createTestingModule({
-        providers: [
-          {
-            provide: 'UserRepository',
-            useClass: UserRepostioryFake,
-          },
-          {
-            provide: 'PasswordRepository',
-            useClass: PasswordRepositoryFake,
-          },
-          {
-            provide: 'ConfigService',
-            useClass: ConfigFakeService,
-          },
-          {
-            provide: 'QueryService',
-            useClass: QueryService,
-          },
-          {
-            provide: 'UserService',
-            useClass: UserFakeService,
-          },
-        ],
-        exports: [UserService],
-      }).compile();
-
-      userService = moduleFixture.get<UserService>(UserService);
-    });
-
-    it('should register user if there is register data', () => {
-      expect(
-        userService.registerUser({
-          username: 'test',
-          password: 'test',
-          algorithmType: AlgorithmTypeEnum.HMAC,
-        }),
-      ).resolves.toBe(true);
-    });
-
-    it('should not register user if there is not register data', () => {
-      expect(userService.registerUser(null)).rejects.toBe(false);
-    });
-
-    it('should login user if there is login data', () => {
-      expect(
-        userService.loginUser({ username: 'test', password: 'test' }),
-      ).resolves.toBe(true);
-    });
-
-    it('should not login user if there is not login data', () => {
-      expect(userService.loginUser(null)).rejects.toBe(false);
-    });
-
-    it('should change user password if there is password data', () => {
-      expect(
-        userService.changePassword({
-          password: 'test',
-          oldPassword: 'test',
-          userId: 1,
-          algorithmType: AlgorithmTypeEnum.HMAC,
-        }),
-      ).resolves.toBe(true);
-    });
-
-    it('should not change user passwordif there is not password data', () => {
-      expect(userService.changePassword(null)).rejects.toBe(false);
     });
   });
 });

@@ -30,13 +30,10 @@ describe('Query service', () => {
           useClass: ConfigFakeService,
         },
         {
-          provide: 'QueryService',
-          useClass: QueryFakeService,
-        },
-        {
           provide: 'UserService',
           useClass: UserFakeService,
         },
+        QueryService,
       ],
       exports: [UserService, QueryService],
     }).compile();

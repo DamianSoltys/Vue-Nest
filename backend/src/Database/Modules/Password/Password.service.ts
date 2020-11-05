@@ -53,6 +53,7 @@ export class PasswordService {
     if (!searchResult && !query.secret) {
       return false;
     }
+
     const decryptedUserPassword = this.decryptSecret(query.secret);
     const decryptedPassword = CryptoJS.AES.decrypt(
       searchResult.password,
