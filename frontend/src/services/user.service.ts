@@ -3,7 +3,7 @@ import {
   ILoginData,
   ILoginResponse,
   IRegisterData
-} from "@/interfaces/User.interface";
+} from "@/interfaces/user.interface";
 import router from "@/router/router";
 
 export class UserService {

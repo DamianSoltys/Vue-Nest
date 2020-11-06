@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IDecryptedPasswordQuery } from 'src/api/locker/locker.interface';
-import { PasswordDto } from 'src/database/Dto/password.dto';
+import { PasswordDto } from 'src/database/dto/password.dto';
 import { Password } from 'src/database/entities/password.entity';
 import { InsertResult, Repository } from 'typeorm';
 import { QueryService } from '../shared/query.service';
@@ -17,7 +17,7 @@ export class PasswordService {
     private passwordRepository: Repository<Password>,
     private configSerivce: ConfigService,
     private queryService: QueryService,
-  ) {}
+  ) { }
 
   //TODO: implement
   public async addPassword(passwordData: PasswordDto): Promise<InsertResult> {

@@ -7,7 +7,7 @@ import {
   ILoginData,
   ILoginResponse,
   IRegisterData
-} from "@/interfaces/User.interface";
+} from "@/interfaces/user.interface";
 import { passwordService } from "@/services/password.service";
 import { userService } from "@/services/user.service";
 import { Action, ActionContext, createStore, Store } from "vuex";
@@ -132,7 +132,7 @@ export default createStore({
     [StoreActions.GET_PASSWORDS]: context => getPasswords(context),
     [StoreActions.DECRYPT_PASSWORD]: (context, payload) =>
       getDecryptedPassword(context, payload),
-    [StoreActions.RESPONSE_ERROR]: () => {},
-    [StoreActions.RESPONSE_SUCCESS]: () => {}
+    [StoreActions.RESPONSE_ERROR]: () => { },
+    [StoreActions.RESPONSE_SUCCESS]: () => { }
   }
 });
