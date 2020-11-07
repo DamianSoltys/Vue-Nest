@@ -234,4 +234,12 @@ export class UserService {
     // Step 5: return all unmarked numbers
     return this.getUnmarked(primes);
   }
+
+  public add(x: number, y: number) {
+    return x + y;
+  }
+
+  public multiply(x: number, y: number) {
+    return x * y;
+  }
 }

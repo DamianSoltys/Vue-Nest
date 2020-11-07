@@ -183,10 +183,28 @@ describe('User service without mock service', () => {
     });
 
     it('should return empty array when limit is 0', () => {
+      jest
+        .spyOn(userService, 'createNumbersArray')
+        .mockImplementation(() => []);
+      jest.spyOn(userService, 'setToTrue').mockImplementation(() => ({}));
+      jest
+        .spyOn(userService, 'findSmallestPrimes')
+        .mockImplementation(() => ({}));
+      jest.spyOn(userService, 'getUnmarked').mockImplementation(() => []);
+
       expect(userService.sift(0)).toStrictEqual([]);
     });
 
     it('should return empty array when limit is 1', () => {
+      jest
+        .spyOn(userService, 'createNumbersArray')
+        .mockImplementation(() => []);
+      jest.spyOn(userService, 'setToTrue').mockImplementation(() => ({}));
+      jest
+        .spyOn(userService, 'findSmallestPrimes')
+        .mockImplementation(() => ({}));
+      jest.spyOn(userService, 'getUnmarked').mockImplementation(() => []);
+
       expect(userService.sift(1)).toStrictEqual([]);
     });
 
@@ -196,6 +214,27 @@ describe('User service without mock service', () => {
 
     it('should return prime numbers with limit of 6', () => {
       const result = [2, 3, 5];
+
+      jest
+        .spyOn(userService, 'createNumbersArray')
+        .mockImplementation(() => [2, 3, 4, 5, 6]);
+      jest.spyOn(userService, 'setToTrue').mockImplementation(() => ({
+        '2': true,
+        '3': true,
+        '4': true,
+        '5': true,
+        '6': true,
+      }));
+      jest.spyOn(userService, 'findSmallestPrimes').mockImplementation(() => ({
+        '2': true,
+        '3': true,
+        '4': false,
+        '5': true,
+        '6': false,
+      }));
+      jest
+        .spyOn(userService, 'getUnmarked')
+        .mockImplementation(() => [2, 3, 5]);
 
       expect(userService.sift(6)).toStrictEqual(result);
     });
@@ -230,6 +269,16 @@ describe('User service without mock service', () => {
       ];
 
       expect(userService.sift(100)).toStrictEqual(result);
+    });
+  });
+
+  describe('Calculator methods', () => {
+    it('should add two numbers', () => {
+      expect(userService.add(1, 2)).toBe(3);
+    });
+
+    it('should multiply two numbers', () => {
+      expect(userService.multiply(1, 2)).toBe(2);
     });
   });
 });
