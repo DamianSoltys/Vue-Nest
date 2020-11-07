@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PasswordDto } from 'src/database/dto/password.dto';
-import { PasswordService } from 'src/database/modules/Password/password.service';
+import { PasswordService } from 'src/database/modules/password/password.service';
 import { QueryService } from 'src/database/modules/shared/query.service';
 import { IDecryptedPasswordQuery } from './locker.interface';
 
