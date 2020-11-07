@@ -9,7 +9,7 @@ import {
   Query,
   Session,
 } from '@nestjs/common';
-import { PasswordDto } from 'src/database/Dto/password.dto';
+import { PasswordDto } from 'src/database/dto/password.dto';
 import { IDecryptedPasswordQuery } from './locker.interface';
 import { LockerService } from './locker.service';
 
