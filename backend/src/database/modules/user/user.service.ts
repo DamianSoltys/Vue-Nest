@@ -125,7 +125,7 @@ export class UserService {
       this.queryBuilder
         .update(Password)
         .set({ password })
-        .where('password.id = :id', { id: passwordRow.id })
+        .where('Password.id = :id', { id: passwordRow.id })
         .execute();
     });
 

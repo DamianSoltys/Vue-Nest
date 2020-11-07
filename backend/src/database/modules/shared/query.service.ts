@@ -26,12 +26,12 @@ export class QueryService {
 
     if (withPassword) {
       searchResult = await this.passQB
-        .where('password.userId = :userId', { userId: id })
+        .where('Password.userId = :userId', { userId: id })
         .addSelect('Password.password')
         .getMany();
     } else {
       searchResult = await this.passQB
-        .where('password.userId = :userId', { userId: id })
+        .where('Password.userId = :userId', { userId: id })
         .getMany();
 
       searchResult.map(result => {
@@ -44,7 +44,7 @@ export class QueryService {
 
   public async getPasswordByWebAddress(webAddress: string): Promise<Password> {
     const searchResult = this.passQB
-      .where('password.webAddress = :webAddress', { webAddress })
+      .where('Password.webAddress = :webAddress', { webAddress })
       .getOne();
 
     return searchResult;
@@ -56,10 +56,10 @@ export class QueryService {
   ): Promise<Password> {
     const searchResult = withPassword
       ? this.passQB
-          .where('password.id = :id', { id })
+          .where('Password.id = :id', { id })
           .addSelect('Password.password')
           .getOne()
-      : this.passQB.where('password.id = :id', { id }).getOne();
+      : this.passQB.where('Password.id = :id', { id }).getOne();
 
     return searchResult;
   }
@@ -67,14 +67,14 @@ export class QueryService {
   //TODO: implement
   public async getUserByLogin(username: string): Promise<User> {
     const searchResult = this.userQB
-      .where('user.username = :username', { username })
+      .where('User.username = :username', { username })
       .getOne();
 
     return searchResult;
   }
 
   public async getUserById(id: number): Promise<User> {
-    const searchResult = this.userQB.where('user.id = :id', { id }).getOne();
+    const searchResult = this.userQB.where('User.id = :id', { id }).getOne();
 
     return searchResult;
   }
