@@ -7,9 +7,9 @@
 4. Create database named bsi or with other name if you changed it in config file.
 4. Run "npm run start:dev" command which starts backend and frontend apps.
 # Docker method
-1. Clone this repository to your computer.
+1. Download docker-compose file.
 2. Install docker and docker-compose if you dont have it.
-3. Run docker-compose up in project folder.
+3. Run docker-compose up in new folder.
 4. Go to localhost:8080 in your browser.
 
 # Tips
