@@ -1,7 +1,9 @@
+import { IResponseType } from "@/interfaces/error.interface";
 import {
   IChangePasswordData,
   IPasswordData
 } from "@/interfaces/password.interface";
+import { errorService } from "./error.service";
 import { userService } from "./user.service";
 
 export class PasswordService {
@@ -21,9 +23,12 @@ export class PasswordService {
       "http://localhost:3000/locker",
       requestOptions
     )
+      .then(response => errorService.handleError(response))
       .then(response => response.json())
       .then(result => result)
-      .catch(error => console.log("error", error));
+      .catch(error =>
+        errorService.handleResponse(IResponseType.ERROR, error.message)
+      );
 
     return request;
   }
@@ -39,9 +44,12 @@ export class PasswordService {
       `http://localhost:3000/locker?userId=${userService.getUserId()}`,
       requestOptions
     )
+      .then(response => errorService.handleError(response))
       .then(response => response.json())
       .then(result => result)
-      .catch(error => console.log("error", error));
+      .catch(error =>
+        errorService.handleResponse(IResponseType.ERROR, error.message)
+      );
 
     return data;
   }
@@ -59,11 +67,14 @@ export class PasswordService {
       `http://localhost:3000/locker/decrypt?userId=${userService.getUserId()}&passwordId=${passwordId}}`,
       requestOptions
     )
+      .then(response => errorService.handleError(response))
       .then(response => response.text())
       .then(result => result)
-      .catch(error => error);
+      .catch(error =>
+        errorService.handleResponse(IResponseType.ERROR, error.message)
+      );
 
-    return data;
+    return data || "";
   }
 }
 

@@ -4,7 +4,7 @@
       class="toast d-flex align-items-center text-white border-0"
       v-bind:class="{
         'bg-success': state.type === IResponseType.SUCCESS,
-        'bg-danger': state.type === IResponseType.ERROR
+        'bg-danger': state.type === IResponseType.ERROR,
       }"
       role="alert"
       aria-live="assertive"
@@ -36,7 +36,7 @@ import {
   onMounted,
   onUnmounted,
   reactive,
-  ref
+  ref,
 } from "vue";
 import { useStore } from "vuex";
 import { IInitalState, StoreActions } from "../../store/store.interface";
@@ -49,7 +49,7 @@ export default defineComponent({
     const state = reactive({
       unsubscribe: () => {},
       message: "",
-      type: ""
+      type: "",
     });
 
     onMounted(() => {
@@ -74,6 +74,6 @@ export default defineComponent({
     });
 
     return { state, IResponseType };
-  }
+  },
 });
 </script>

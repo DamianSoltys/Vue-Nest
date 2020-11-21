@@ -34,23 +34,7 @@ export class UserController {
     @Session() session: { password: string },
     @Request() req,
   ): Promise<{ accessToken: string }> {
-    try {
-      const status = await this.userService.loginUser(loginData);
-
-      if (status) {
-        session.password = loginData.password;
-      }
-
-      return this.authService.login(req.user, loginData.password);
-    } catch {
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: 'Something went wrong, try again later',
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return this.authService.login(req.user, loginData.password);
   }
 
   @Post('register')

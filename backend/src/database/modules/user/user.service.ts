@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, InsertResult } from 'typeorm';
 import { User } from 'src/database/entities/user.entity';
@@ -60,10 +60,26 @@ export class UserService {
     const searchResult = await this.queryService.getUserByLogin(username);
 
     if (!searchResult) {
-      return false;
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'User with given cridentials not found.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
-    return this.comparePassword(searchResult, password);
+    if (!this.comparePassword(searchResult, password)) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Password is incorrect.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return true;
   }
 
   //TODO: add try catch implement changing all passwords

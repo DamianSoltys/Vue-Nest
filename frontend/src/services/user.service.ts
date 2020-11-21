@@ -1,3 +1,4 @@
+import { IResponseType } from "@/interfaces/error.interface";
 import { IChangePasswordData } from "@/interfaces/password.interface";
 import {
   ILoginData,
@@ -5,6 +6,7 @@ import {
   IRegisterData
 } from "@/interfaces/user.interface";
 import router from "@/router/router";
+import { errorService } from "./error.service";
 
 export class UserService {
   public async loginUser(userData: ILoginData): Promise<ILoginResponse> {
@@ -20,9 +22,12 @@ export class UserService {
       "http://localhost:3000/user/login",
       requestOptions
     )
+      .then(response => errorService.handleError(response))
       .then(response => response.json())
       .then(result => result)
-      .catch(error => console.log("error", error));
+      .catch(error => {
+        errorService.handleResponse(IResponseType.ERROR, error.message);
+      });
 
     if (request?.accessToken) {
       this.saveLoginData(request);
@@ -49,9 +54,12 @@ export class UserService {
     };
 
     return await fetch("http://localhost:3000/user/register", requestOptions)
+      .then(response => errorService.handleError(response))
       .then(response => response.json())
       .then(result => result)
-      .catch(error => console.log("error", error));
+      .catch(error => {
+        errorService.handleResponse(IResponseType.ERROR, error.message);
+      });
   }
 
   public async changePassword(passwordData: IChangePasswordData): Promise<any> {
@@ -68,9 +76,12 @@ export class UserService {
       "http://localhost:3000/user/password",
       requestOptions
     )
+      .then(response => errorService.handleError(response))
       .then(response => response.text())
       .then(result => result)
-      .catch(error => console.log("error", error));
+      .catch(error => {
+        errorService.handleResponse(IResponseType.ERROR, error.message);
+      });
 
     if (request) {
       const data: ILoginResponse = { secretToken: request };
@@ -91,9 +102,12 @@ export class UserService {
     };
 
     fetch("http://localhost:3000/user", requestOptions)
+      .then(response => errorService.handleError(response))
       .then(response => response.text())
       .then(result => console.log(result))
-      .catch(error => console.log("error", error));
+      .catch(error => {
+        errorService.handleResponse(IResponseType.ERROR, error.message);
+      });
 
     return false;
   }

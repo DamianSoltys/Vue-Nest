@@ -51,6 +51,9 @@ export const MockUsers = [
     username: 'test',
     algorithmType: AlgorithmTypeEnum.HMAC,
     saltOrKey: 'test',
+    blockDate: null,
+    isBlocked: false,
+    numberOfWrongLogins: null,
   },
   {
     id: 2,
@@ -58,6 +61,9 @@ export const MockUsers = [
     username: 'test',
     algorithmType: AlgorithmTypeEnum.HMAC,
     saltOrKey: 'test',
+    blockDate: null,
+    isBlocked: false,
+    numberOfWrongLogins: null,
   },
   {
     id: 3,
@@ -65,6 +71,9 @@ export const MockUsers = [
     username: 'test',
     algorithmType: AlgorithmTypeEnum.HMAC,
     saltOrKey: 'test',
+    blockDate: null,
+    isBlocked: false,
+    numberOfWrongLogins: null,
   },
 ];
 
@@ -75,4 +84,7 @@ export const MockUser = {
   username: 'test',
   algorithmType: AlgorithmTypeEnum.HMAC,
   saltOrKey: 'test',
+  blockDate: null,
+  isBlocked: false,
+  numberOfWrongLogins: null,
 };
