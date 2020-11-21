@@ -16,12 +16,6 @@ export class UserControllerService {
     return databaseResponse ? true : false;
   }
 
-  async loginUser(userData: LoginUserDto): Promise<boolean> {
-    const databaseResponse = await this.userDBService.loginUser(userData);
-
-    return databaseResponse ? true : false;
-  }
-
   async changePassword(passwordData: ChangePasswordDto): Promise<string> {
     const databaseResponse = await this.userDBService.changePassword(
       passwordData,

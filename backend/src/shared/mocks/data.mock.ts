@@ -54,6 +54,8 @@ export const MockUsers = [
     blockDate: null,
     isBlocked: false,
     numberOfWrongLogins: null,
+    lastSuccessLogin: null,
+    lastFailureLogin: null,
   },
   {
     id: 2,
@@ -64,6 +66,8 @@ export const MockUsers = [
     blockDate: null,
     isBlocked: false,
     numberOfWrongLogins: null,
+    lastSuccessLogin: null,
+    lastFailureLogin: null,
   },
   {
     id: 3,
@@ -74,6 +78,8 @@ export const MockUsers = [
     blockDate: null,
     isBlocked: false,
     numberOfWrongLogins: null,
+    lastSuccessLogin: null,
+    lastFailureLogin: null,
   },
 ];
 
@@ -87,4 +93,6 @@ export const MockUser = {
   blockDate: null,
   isBlocked: false,
   numberOfWrongLogins: null,
+  lastSuccessLogin: null,
+  lastFailureLogin: null,
 };

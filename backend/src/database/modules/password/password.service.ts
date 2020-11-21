@@ -10,14 +10,14 @@ var CryptoJS = require('crypto-js');
 
 @Injectable()
 export class PasswordService {
-  private queryBuilder = this.passwordRepository.createQueryBuilder();
+  private passQB = this.passwordRepository.createQueryBuilder();
 
   constructor(
     @InjectRepository(Password)
     private passwordRepository: Repository<Password>,
     private configSerivce: ConfigService,
     private queryService: QueryService,
-  ) { }
+  ) {}
 
   //TODO: implement
   public async addPassword(passwordData: PasswordDto): Promise<InsertResult> {
@@ -34,7 +34,7 @@ export class PasswordService {
       ).toString();
 
       passwordData.password = encryptedPassword;
-      insertResult = this.queryBuilder
+      insertResult = this.passQB
         .insert()
         .into(Password)
         .values({ ...passwordData, user: userSearchResult.id })
@@ -65,7 +65,7 @@ export class PasswordService {
 
   //TODO: implement
   public async changePassword(): Promise<InsertResult> {
-    const insertResult = this.queryBuilder
+    const insertResult = this.passQB
       .insert()
       .into(Password)
       .values({})
@@ -76,7 +76,7 @@ export class PasswordService {
 
   //TODO: implement
   public async deletePassword(): Promise<InsertResult> {
-    const insertResult = this.queryBuilder
+    const insertResult = this.passQB
       .insert()
       .into(Password)
       .values({})

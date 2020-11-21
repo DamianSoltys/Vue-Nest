@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Account } from 'src/database/entities/account.entity';
 import { Password } from 'src/database/entities/password.entity';
 import { User } from 'src/database/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -9,12 +9,15 @@ import { Repository } from 'typeorm';
 export class QueryService {
   private userQB = this.userRepository.createQueryBuilder();
   private passQB = this.passwordRepository.createQueryBuilder();
+  private accQB = this.accountRepository.createQueryBuilder();
 
   constructor(
     @InjectRepository(Password)
     private passwordRepository: Repository<Password>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Account)
+    private accountRepository: Repository<Account>,
   ) {}
 
   //TODO: implement
@@ -64,17 +67,47 @@ export class QueryService {
     return searchResult;
   }
 
-  //TODO: implement
-  public async getUserByLogin(username: string): Promise<User> {
+  public async getUserByLogin(
+    username: string,
+    register?: boolean,
+  ): Promise<User> {
     const searchResult = this.userQB
       .where('User.username = :username', { username })
       .getOne();
 
+    if (!(await searchResult) && !register) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'User with given cridentials not found.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
     return searchResult;
   }
 
-  public async getUserById(id: number): Promise<User> {
+  public async getUserById(id: number, register?: boolean): Promise<User> {
     const searchResult = this.userQB.where('User.id = :id', { id }).getOne();
+
+    if (!(await searchResult) && !register) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'User with given cridentials not found.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return searchResult;
+  }
+
+  public async getAccountDataByAddress(address: string): Promise<Account> {
+    const searchResult = this.accQB
+      .where('Account.ipAddress = :address', { address })
+      .getOne();
 
     return searchResult;
   }

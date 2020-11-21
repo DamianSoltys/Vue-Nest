@@ -9,10 +9,6 @@ export class User {
     () => Password,
     password => password.user,
   )
-  @OneToMany(
-    () => Account,
-    account => account.user,
-  )
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -28,12 +24,18 @@ export class User {
   @Column()
   algorithmType: AlgorithmTypeEnum;
 
-  @Column()
+  @Column({ nullable: true })
   numberOfWrongLogins: number;
 
-  @Column()
+  @Column({ nullable: true })
   blockDate: Date;
 
-  @Column({ default: false })
+  @Column({ default: false, nullable: true })
   isBlocked: boolean;
+
+  @Column({ nullable: true })
+  lastSuccessLogin: Date;
+
+  @Column({ nullable: true })
+  lastFailureLogin: Date;
 }

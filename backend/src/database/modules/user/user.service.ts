@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { AlgorithmTypeEnum } from 'src/database/constants/algorithmType.const';
 import { QueryService } from '../shared/query.service';
 import { Password } from 'src/database/entities/password.entity';
+import { Account } from 'src/database/entities/account.entity';
 var CryptoJS = require('crypto-js');
 
 interface PrimesHash {
@@ -19,11 +20,14 @@ interface PrimesHash {
 
 @Injectable()
 export class UserService {
-  private queryBuilder = this.usersRepository.createQueryBuilder();
+  private userQB = this.userRepository.createQueryBuilder();
+  public accQB = this.accountRepository.createQueryBuilder();
 
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private userRepository: Repository<User>,
+    @InjectRepository(Account)
+    private accountRepository: Repository<Account>,
     private configSerivce: ConfigService,
     private queryService: QueryService,
   ) {}
@@ -39,11 +43,11 @@ export class UserService {
       password,
     );
 
-    const searchResult = await this.queryService.getUserByLogin(username);
+    const searchResult = await this.queryService.getUserByLogin(username, true);
     let insertResult = null;
 
     if (!searchResult) {
-      insertResult = this.queryBuilder
+      insertResult = this.userQB
         .insert()
         .into(User)
         .values({ username, passwordHash, saltOrKey, algorithmType })
@@ -53,23 +57,21 @@ export class UserService {
     return insertResult;
   }
 
-  public async loginUser({
-    username,
-    password,
-  }: LoginUserDto): Promise<boolean> {
+  public async loginUser(
+    { username, password }: LoginUserDto,
+    remoteAddress: string,
+  ): Promise<User> {
     const searchResult = await this.queryService.getUserByLogin(username);
+    const accountResult = await this.queryService.getAccountDataByAddress(
+      remoteAddress,
+    );
 
-    if (!searchResult) {
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: 'User with given cridentials not found.',
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    this.checkIfBlocked(searchResult, accountResult);
 
     if (!this.comparePassword(searchResult, password)) {
+      this.setUserLoginData(searchResult);
+      this.setIpLoginData(accountResult, remoteAddress);
+
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -77,9 +79,182 @@ export class UserService {
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    } else {
+      this.setUserSuccessLoginData(searchResult);
+      this.setIpSuccessLoginData(accountResult, remoteAddress);
     }
 
-    return true;
+    return searchResult;
+  }
+
+  private checkIfBlocked(user: User, account: Account) {
+    if (!user || !account) {
+      return;
+    }
+
+    if (user.isBlocked || account.isBlocked) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error:
+            'Your account is blocked, unblock it by clicking on the unblock button.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    const blockedDate = user.blockDate || account.blockDate;
+
+    if (blockedDate?.getTime() >= new Date().getTime()) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: `Your account is blocked until ${blockedDate}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private async setUserSuccessLoginData({ id }: User) {
+    try {
+      const changeResult = await this.userQB
+        .update(User)
+        .set({
+          lastSuccessLogin: new Date(),
+          numberOfWrongLogins: null,
+          isBlocked: false,
+          blockDate: null,
+        })
+        .where('User.id = :id', { id })
+        .execute();
+    } catch {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something went wrong, try again later.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private async setUserLoginData({ numberOfWrongLogins, id }: User) {
+    try {
+      const wrongLogins = numberOfWrongLogins + 1;
+      const changeResult = await this.userQB
+        .update(User)
+        .set({
+          lastFailureLogin: new Date(),
+          numberOfWrongLogins: wrongLogins,
+          isBlocked: false,
+          blockDate:
+            wrongLogins === 1 ? null : this.setUserBlockDate(wrongLogins),
+        })
+        .where('User.id = :id', { id })
+        .execute();
+    } catch {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something went wrong, try again later.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private setIpSuccessLoginData(account: Account, ipAddress?: string) {
+    if (!account) {
+      const insertResult = this.accQB
+        .insert()
+        .into(Account)
+        .values({
+          ipAddress,
+          lastFailureLogin: null,
+          lastSuccessLogin: new Date(),
+          isBlocked: false,
+          blockDate: null,
+          numberOfWrongLogins: null,
+        })
+        .execute();
+    } else {
+      const insertResult = this.accQB
+        .update(Account)
+        .set({
+          lastFailureLogin: null,
+          lastSuccessLogin: new Date(),
+          isBlocked: false,
+          blockDate: null,
+          numberOfWrongLogins: null,
+        })
+        .where('Account.ipAddress = :ipAddress', { ipAddress })
+        .execute();
+    }
+  }
+
+  private setIpLoginData(account: Account, ipAddress?: string) {
+    if (!account) {
+      const insertResult = this.accQB
+        .insert()
+        .into(Account)
+        .values({
+          ipAddress,
+          lastFailureLogin: new Date(),
+          lastSuccessLogin: null,
+          isBlocked: false,
+          blockDate: null,
+          numberOfWrongLogins: 1,
+        })
+        .execute();
+    } else {
+      const { numberOfWrongLogins } = account;
+      const wrongLogins =
+        numberOfWrongLogins === 4
+          ? numberOfWrongLogins
+          : numberOfWrongLogins + 1;
+      const insertResult = this.accQB
+        .update(Account)
+        .set({
+          lastFailureLogin: new Date(),
+          numberOfWrongLogins: wrongLogins,
+          isBlocked: wrongLogins === 4,
+          blockDate:
+            wrongLogins === 4 ? null : this.setIpBlockDate(wrongLogins),
+        })
+        .where('Account.ipAddress = :ipAddress', { ipAddress })
+        .execute();
+    }
+  }
+
+  private setUserBlockDate(numberOfWrongLogins: number) {
+    switch (numberOfWrongLogins) {
+      case 1: {
+        return new Date();
+      }
+      case 2: {
+        return new Date(new Date().getTime() + 2 * 1000);
+      }
+      case 3: {
+        return new Date(new Date().getTime() + 5 * 1000);
+      }
+      default: {
+        return new Date(new Date().getTime() + 2 * 60000);
+      }
+    }
+  }
+
+  private setIpBlockDate(numberOfWrongLogins: number) {
+    switch (numberOfWrongLogins) {
+      case 2: {
+        return new Date(new Date().getTime() + 2 * 1000);
+      }
+      case 3: {
+        return new Date(new Date().getTime() + 5 * 1000);
+      }
+      default: {
+        return new Date();
+      }
+    }
   }
 
   //TODO: add try catch implement changing all passwords
@@ -108,7 +283,7 @@ export class UserService {
       passwordData.password,
     );
 
-    const changeResult = await this.queryBuilder
+    const changeResult = await this.userQB
       .update(User)
       .set({
         passwordHash,
@@ -138,7 +313,7 @@ export class UserService {
         passwordData.password,
       ).toString();
 
-      this.queryBuilder
+      this.userQB
         .update(Password)
         .set({ password })
         .where('Password.id = :id', { id: passwordRow.id })

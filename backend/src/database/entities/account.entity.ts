@@ -14,21 +14,21 @@ export class Account {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(
-    () => User,
-    user => user.id,
-  )
-  user: number;
-
   @Column()
+  ipAddress: string;
+
+  @Column({ nullable: true })
+  numberOfWrongLogins: number;
+
+  @Column({ nullable: true })
   blockDate: Date;
 
-  @Column({ default: false })
+  @Column({ default: false, nullable: true })
   isBlocked: boolean;
 
-  @Column()
-  blockedAddress: string;
+  @Column({ nullable: true })
+  lastSuccessLogin: Date;
 
-  @Column()
-  numberOfWrongLogins: number;
+  @Column({ nullable: true })
+  lastFailureLogin: Date;
 }

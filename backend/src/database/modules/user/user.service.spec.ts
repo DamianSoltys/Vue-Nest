@@ -51,7 +51,7 @@ describe('User service without mock service', () => {
 
     it('should login user if there is login data and password matches', () => {
       expect(
-        userService.loginUser({ username: 'test', password: 'test' }),
+        userService.loginUser({ username: 'test', password: 'test' }, ''),
       ).resolves.toBe(true);
     });
 
@@ -77,6 +77,11 @@ describe('User service without mock service', () => {
         username: 'test',
         algorithmType: AlgorithmTypeEnum.HMAC,
         saltOrKey: 'test',
+        blockDate: null,
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
       };
       jest.spyOn(userService, 'comparePassword').mockImplementation(() => true);
 
@@ -91,6 +96,11 @@ describe('User service without mock service', () => {
         username: 'test',
         algorithmType: AlgorithmTypeEnum.HMAC,
         saltOrKey: 'test',
+        blockDate: null,
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
       };
 
       expect(userService.comparePassword(user, 'test')).toBe(true);
@@ -104,6 +114,11 @@ describe('User service without mock service', () => {
         username: 'test',
         algorithmType: AlgorithmTypeEnum.HMAC,
         saltOrKey: 'test',
+        blockDate: null,
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
       };
 
       expect(userService.comparePassword(user, 'testtt')).toBe(false);

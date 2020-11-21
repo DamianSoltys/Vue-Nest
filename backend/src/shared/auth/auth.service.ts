@@ -16,30 +16,20 @@ export class AuthService {
     private configSerivce: ConfigService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.queryService.getUserByLogin(username);
+  async validateUser(
+    username: string,
+    password: string,
+    remoteAddress: string,
+  ): Promise<any> {
+    const searchResult = await this.usersDbService.loginUser(
+      {
+        username,
+        password,
+      },
+      remoteAddress,
+    );
 
-    if (!user) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: 'User with given cridentials not found',
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    if (!this.usersDbService.comparePassword(user, password)) {
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: 'Password is incorrect.',
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    const { passwordHash, saltOrKey, ...result } = user;
+    const { passwordHash, saltOrKey, ...result } = searchResult;
 
     return result;
   }
