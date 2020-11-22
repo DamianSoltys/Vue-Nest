@@ -78,8 +78,18 @@ export class QueryService {
     if (!(await searchResult) && !register) {
       throw new HttpException(
         {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          status: HttpStatus.NOT_FOUND,
           error: 'User with given cridentials not found.',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if ((await searchResult) && register) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'User with given cridentials is already registered.',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );

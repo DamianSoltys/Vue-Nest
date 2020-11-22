@@ -46,8 +46,8 @@ export class AuthService {
         secretToken: encryptedPassword,
         username: payload.username,
         userId: user.id,
-        lastFailureLogin: user.lastFailureLogin.toLocaleString(),
-        lastSuccessLogin: user.lastSuccessLogin.toLocaleString(),
+        lastFailureLogin: user.lastFailureLogin?.toLocaleString(),
+        lastSuccessLogin: user.lastSuccessLogin?.toLocaleString(),
       };
     } catch {
       throw new HttpException(
