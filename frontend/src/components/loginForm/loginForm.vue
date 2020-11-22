@@ -19,9 +19,18 @@
           v-model="form.password"
         />
       </div>
-      <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">
-        Zaloguj
-      </button>
+      <div>
+        <button class="btn btn-primary w-100" @click.prevent="handleSubmit()">
+          Zaloguj
+        </button>
+        <button
+          v-if="state.isBlocked"
+          class="btn btn-primary w-100 mt-2"
+          @click.prevent="handleUnblock()"
+        >
+          Odblokuj adres
+        </button>
+      </div>
     </form>
   </div>
 </template>
@@ -32,24 +41,43 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from "vue";
+import { defineComponent, onMounted, reactive, ref, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { IInitalState, StoreActions } from "../../store/store.interface";
 
 export default defineComponent({
   setup() {
     const store = useStore();
+    const state = reactive({
+      unsubscribe: () => {},
+      isBlocked: false,
+    });
     const form = reactive({
       username: "",
-      password: ""
+      password: "",
+    });
+
+    state.unsubscribe = store.subscribeAction((action, storeState) => {
+      if (action.type === StoreActions.TOGGLE_UNBLOCK_BUTTON) {
+        console.log("test");
+        state.isBlocked = action?.payload;
+      }
+    });
+
+    onUnmounted(() => {
+      state.unsubscribe();
     });
 
     function handleSubmit() {
       store.dispatch(StoreActions.LOGIN_USER, form);
     }
 
-    return { form, handleSubmit };
-  }
+    function handleUnblock() {
+      store.dispatch(StoreActions.UNBLOCK_ACCOUNT);
+    }
+
+    return { form, handleSubmit, handleUnblock, state };
+  },
 });
 </script>
 

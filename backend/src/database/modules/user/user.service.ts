@@ -87,6 +87,34 @@ export class UserService {
     return searchResult;
   }
 
+  public async unblockAccount(ipAddress: string): Promise<boolean> {
+    const accountResult = await this.queryService.getAccountDataByAddress(
+      ipAddress,
+    );
+
+    if (!accountResult) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'This ip address is not blocked',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const insertResult = this.accQB
+      .update(Account)
+      .set({
+        isBlocked: false,
+        blockDate: null,
+        numberOfWrongLogins: null,
+      })
+      .where('Account.ipAddress = :ipAddress', { ipAddress })
+      .execute();
+
+    return true;
+  }
+
   private checkIfBlocked(user: User, account: Account) {
     if (!user || !account) {
       return;
@@ -95,11 +123,11 @@ export class UserService {
     if (user.isBlocked || account.isBlocked) {
       throw new HttpException(
         {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          status: HttpStatus.FORBIDDEN,
           error:
-            'Your account is blocked, unblock it by clicking on the unblock button.',
+            'Your account is blocked permanently, unblock it by clicking on the unblock button.',
         },
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.FORBIDDEN,
       );
     }
     const blockedDate = user.blockDate || account.blockDate;
@@ -107,10 +135,10 @@ export class UserService {
     if (blockedDate?.getTime() >= new Date().getTime()) {
       throw new HttpException(
         {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          status: HttpStatus.UNAUTHORIZED,
           error: `Your account is blocked until ${blockedDate}`,
         },
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.UNAUTHORIZED,
       );
     }
   }
@@ -181,7 +209,6 @@ export class UserService {
       const insertResult = this.accQB
         .update(Account)
         .set({
-          lastFailureLogin: null,
           lastSuccessLogin: new Date(),
           isBlocked: false,
           blockDate: null,

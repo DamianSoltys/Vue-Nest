@@ -8,11 +8,14 @@ import {
   Post,
   Query,
   Session,
+  UseGuards,
 } from '@nestjs/common';
 import { PasswordDto } from 'src/database/dto/password.dto';
+import { JwtAuthGuard } from 'src/shared/auth/jwt-auth.guard';
 import { IDecryptedPasswordQuery } from './locker.interface';
 import { LockerService } from './locker.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('locker')
 export class LockerController {
   constructor(private readonly lockerService: LockerService) {}

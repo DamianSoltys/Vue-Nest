@@ -13,4 +13,9 @@ export interface ILoginResponse {
   username?: string;
   secretToken?: string;
   userId?: number;
+  numberOfWrongLogins?: number;
+  blockDate?: Date;
+  isBlocked?: boolean;
+  lastSuccessLogin?: string;
+  lastFailureLogin?: string;
 }

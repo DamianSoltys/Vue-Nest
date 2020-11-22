@@ -25,7 +25,13 @@ export class PasswordService {
     )
       .then(response => errorService.handleError(response))
       .then(response => response.json())
-      .then(result => result)
+      .then(result => {
+        errorService.handleResponse(
+          IResponseType.SUCCESS,
+          "Password added successfully."
+        );
+        return result;
+      })
       .catch(error =>
         errorService.handleResponse(IResponseType.ERROR, error.message)
       );

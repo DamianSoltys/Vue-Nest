@@ -5,10 +5,14 @@ export interface IInitalState {
   logged: boolean;
   userId: number | null;
   passwords: IPasswordsList[];
+  lastFailureLogin: string | null;
+  lastSuccessLogin: string | null;
 }
 
 export const StoreActions = {
   CHECK_AUTH: "[USER]CHECK_AUTH",
+  TOGGLE_UNBLOCK_BUTTON: "[USER]TOGGLE_UNBLOCK_BUTTON",
+  UNBLOCK_ACCOUNT: "[USER]UNBLOCK_ACCOUNT",
   LOGIN_USER: "[USER]LOGIN_USER",
   LOGOUT_USER: "[USER]LOGOUT_USER",
   REGISTER_USER: "[USER]REGISTER_USER",

@@ -41,9 +41,15 @@
           </li>
         </template>
       </div>
-      <router-link class="navbar-brand" v-if="state.logged" to="/home">{{
-        state.username
-      }}</router-link>
+      <div v-if="state.logged">
+        <router-link class="navbar-brand" to="/home"
+          >Użytkownik: {{ state.username }}</router-link
+        >
+        <div class="mt-2">
+          <p>Ostanie logowanie: {{ state.lastSuccessLogin }}</p>
+          <p>Ostania próba logowania: {{ state.lastFailureLogin }}</p>
+        </div>
+      </div>
     </div>
   </nav>
 </template>
@@ -67,7 +73,9 @@ export default defineComponent({
     const state = reactive({
       list: true,
       logged: computed(() => storeState.logged),
-      username: computed(() => storeState.username)
+      username: computed(() => storeState.username),
+      lastFailureLogin: computed(() => storeState.lastFailureLogin),
+      lastSuccessLogin: computed(() => storeState.lastSuccessLogin),
     });
 
     onMounted(() => {
@@ -79,7 +87,7 @@ export default defineComponent({
     }
 
     return { state, loginForm, logout };
-  }
+  },
 });
 </script>
 

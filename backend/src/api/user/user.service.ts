@@ -23,4 +23,10 @@ export class UserControllerService {
 
     return databaseResponse;
   }
+
+  async unblockAccount(ipAddress: string): Promise<boolean> {
+    const databaseResponse = await this.userDBService.unblockAccount(ipAddress);
+
+    return databaseResponse;
+  }
 }

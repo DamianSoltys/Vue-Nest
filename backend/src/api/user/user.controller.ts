@@ -52,6 +52,22 @@ export class UserController {
     }
   }
 
+  @Get('unblockAccount')
+  async unblockAccount(@Request() req): Promise<boolean> {
+    try {
+      return this.userService.unblockAccount(req.connection.remoteAddress);
+    } catch {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something went wrong, try again later',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Put('password')
   async changePassword(
     @Body() passwordData: ChangePasswordDto,

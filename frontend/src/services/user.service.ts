@@ -22,9 +22,14 @@ export class UserService {
       "http://localhost:3000/user/login",
       requestOptions
     )
+      .then(response => errorService.handleBlockResponse(response))
       .then(response => errorService.handleError(response))
       .then(response => response.json())
-      .then(result => result)
+      .then(result => {
+        errorService.handleResponse(IResponseType.SUCCESS, "Login successful");
+
+        return result;
+      })
       .catch(error => {
         errorService.handleResponse(IResponseType.ERROR, error.message);
       });
@@ -56,7 +61,14 @@ export class UserService {
     return await fetch("http://localhost:3000/user/register", requestOptions)
       .then(response => errorService.handleError(response))
       .then(response => response.json())
-      .then(result => result)
+      .then(result => {
+        errorService.handleResponse(
+          IResponseType.SUCCESS,
+          "Register successful, you can now login."
+        );
+
+        return result;
+      })
       .catch(error => {
         errorService.handleResponse(IResponseType.ERROR, error.message);
       });
@@ -78,7 +90,14 @@ export class UserService {
     )
       .then(response => errorService.handleError(response))
       .then(response => response.text())
-      .then(result => result)
+      .then(result => {
+        errorService.handleResponse(
+          IResponseType.SUCCESS,
+          "Password changed successfully."
+        );
+
+        return result;
+      })
       .catch(error => {
         errorService.handleResponse(IResponseType.ERROR, error.message);
       });
@@ -112,6 +131,32 @@ export class UserService {
     return false;
   }
 
+  public async unblockAccount() {
+    const myHeaders = new Headers();
+    const requestOptions: RequestInit = {
+      method: "GET",
+      headers: myHeaders
+    };
+
+    const data = await fetch(
+      `http://localhost:3000/user/unblockAccount`,
+      requestOptions
+    )
+      .then(response => errorService.handleError(response))
+      .then(response => {
+        errorService.handleResponse(
+          IResponseType.SUCCESS,
+          "Your address was unblocked, try login again."
+        );
+        return response;
+      })
+      .catch(error =>
+        errorService.handleResponse(IResponseType.ERROR, error.message)
+      );
+
+    return data ? true : false;
+  }
+
   //TODO: improve
   public getToken() {
     return localStorage.getItem("token");
@@ -133,6 +178,14 @@ export class UserService {
   }
 
   //TODO: improve
+  public getDates() {
+    return {
+      lastFailureLogin: localStorage.getItem("lastFailureLogin"),
+      lastSuccessLogin: localStorage.getItem("lastSuccessLogin")
+    };
+  }
+
+  //TODO: improve
   private saveLoginData(request: ILoginResponse) {
     request?.accessToken
       ? localStorage.setItem("token", request.accessToken)
@@ -145,6 +198,12 @@ export class UserService {
       : null;
     request?.userId?.toString()
       ? localStorage.setItem("userId", request.userId.toString())
+      : null;
+    request?.lastFailureLogin
+      ? localStorage.setItem("lastFailureLogin", request.lastFailureLogin)
+      : null;
+    request?.lastSuccessLogin
+      ? localStorage.setItem("lastSuccessLogin", request.lastSuccessLogin)
       : null;
   }
 }

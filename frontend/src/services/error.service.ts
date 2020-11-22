@@ -19,6 +19,14 @@ export class ErrorService {
 
     return response;
   }
+
+  async handleBlockResponse(response: Response) {
+    if (!response.ok && response.status === 403) {
+      store.dispatch(StoreActions.TOGGLE_UNBLOCK_BUTTON, true);
+    }
+
+    return response;
+  }
 }
 
 export const errorService = new ErrorService();
