@@ -1,15 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AlgorithmTypeEnum } from 'src/database/constants/algorithmType.const';
 import { User } from 'src/database/entities/user.entity';
+import { Account } from 'src/database/entities/account.entity';
 import {
   UserRepostioryFake,
   PasswordRepositoryFake,
   ConfigFakeService,
   QueryFakeService,
   UserFakeService,
+  AccountRepositoryFake,
 } from 'src/shared/mocks/class.mock';
 import { QueryService } from '../shared/query.service';
 import { UserService } from './user.service';
+import { HttpException } from '@nestjs/common';
 
 describe('User service without mock service', () => {
   let userService: UserService;
@@ -20,6 +23,10 @@ describe('User service without mock service', () => {
         {
           provide: 'UserRepository',
           useClass: UserRepostioryFake,
+        },
+        {
+          provide: 'AccountRepository',
+          useClass: AccountRepositoryFake,
         },
         {
           provide: 'PasswordRepository',
@@ -38,6 +45,220 @@ describe('User service without mock service', () => {
     userService = moduleFixture.get<UserService>(UserService);
   });
 
+  describe('Blockade functionality methods', () => {
+    it('should return null if there is not user/account', () => {
+      const user: User = null;
+      const account: Account = null;
+
+      expect(userService.checkIfBlocked(user, account)).toBeNull();
+    });
+
+    it('should return nothing if user/account is not blocked', () => {
+      const user: User = {
+        id: 1,
+        passwordHash:
+          '9ba1f63365a6caf66e46348f43cdef956015bea997adeb06e69007ee3ff517df10fc5eb860da3d43b82c2a040c931119d2dfc6d08e253742293a868cc2d82015',
+        username: 'test',
+        algorithmType: AlgorithmTypeEnum.HMAC,
+        saltOrKey: 'test',
+        blockDate: null,
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
+      };
+      const account: Account = {
+        id: 1,
+        ipAddress: '::1',
+        blockDate: null,
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
+      };
+
+      expect(userService.checkIfBlocked(user, account)).toBeUndefined();
+    });
+
+    it('should return true if unblocking is successful', () => {
+      expect(userService.unblockAccount('::1')).resolves.toBe(true);
+    });
+
+    it('should throw error if user/account is blocked permanently', () => {
+      const user: User = {
+        id: 1,
+        passwordHash:
+          '9ba1f63365a6caf66e46348f43cdef956015bea997adeb06e69007ee3ff517df10fc5eb860da3d43b82c2a040c931119d2dfc6d08e253742293a868cc2d82015',
+        username: 'test',
+        algorithmType: AlgorithmTypeEnum.HMAC,
+        saltOrKey: 'test',
+        blockDate: null,
+        isBlocked: true,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
+      };
+      const account: Account = {
+        id: 1,
+        ipAddress: '::1',
+        blockDate: null,
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
+      };
+
+      expect(() => {
+        userService.checkIfBlocked(user, account);
+      }).toThrowError(HttpException);
+    });
+
+    it('should throw error if user/account is blocked temporary', () => {
+      const user: User = {
+        id: 1,
+        passwordHash:
+          '9ba1f63365a6caf66e46348f43cdef956015bea997adeb06e69007ee3ff517df10fc5eb860da3d43b82c2a040c931119d2dfc6d08e253742293a868cc2d82015',
+        username: 'test',
+        algorithmType: AlgorithmTypeEnum.HMAC,
+        saltOrKey: 'test',
+        blockDate: new Date(),
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
+      };
+      const account: Account = {
+        id: 1,
+        ipAddress: '::1',
+        blockDate: null,
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
+      };
+
+      expect(() => {
+        userService.checkIfBlocked(user, account);
+      }).toThrowError(HttpException);
+    });
+
+    it('should update user data when login is successful', () => {
+      const user: User = {
+        id: 1,
+        passwordHash:
+          '9ba1f63365a6caf66e46348f43cdef956015bea997adeb06e69007ee3ff517df10fc5eb860da3d43b82c2a040c931119d2dfc6d08e253742293a868cc2d82015',
+        username: 'test',
+        algorithmType: AlgorithmTypeEnum.HMAC,
+        saltOrKey: 'test',
+        blockDate: new Date(),
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
+      };
+
+      expect(
+        userService.setUserSuccessLoginData(user),
+      ).resolves.toBeUndefined();
+    });
+
+    it('should update user data when login is unsuccessful', () => {
+      const user: User = {
+        id: 1,
+        passwordHash:
+          '9ba1f63365a6caf66e46348f43cdef956015bea997adeb06e69007ee3ff517df10fc5eb860da3d43b82c2a040c931119d2dfc6d08e253742293a868cc2d82015',
+        username: 'test',
+        algorithmType: AlgorithmTypeEnum.HMAC,
+        saltOrKey: 'test',
+        blockDate: new Date(),
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
+      };
+
+      expect(userService.setUserLoginData(user)).resolves.toBeUndefined();
+    });
+
+    it('should update account data when login is successful', () => {
+      const account: Account = {
+        id: 1,
+        ipAddress: '::1',
+        blockDate: null,
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
+      };
+
+      expect(
+        userService.setIpSuccessLoginData(account),
+      ).resolves.toBeUndefined();
+    });
+
+    it('should update account data when login is unsuccessful', () => {
+      const account: Account = {
+        id: 1,
+        ipAddress: '::1',
+        blockDate: null,
+        isBlocked: false,
+        numberOfWrongLogins: null,
+        lastSuccessLogin: null,
+        lastFailureLogin: null,
+      };
+
+      expect(userService.setIpLoginData(account)).resolves.toBeUndefined();
+    });
+
+    it('should return actual date', () => {
+      expect(userService.setUserBlockDate(1).getTime()).toBe(
+        new Date().getTime(),
+      );
+    });
+
+    it('should return date 5 seconds in the future', () => {
+      expect(userService.setUserBlockDate(2).getTime()).toBe(
+        new Date(new Date().getTime() + 5 * 1000).getTime(),
+      );
+    });
+
+    it('should return date 10 seconds in the future', () => {
+      expect(userService.setUserBlockDate(3).getTime()).toBe(
+        new Date(new Date().getTime() + 10 * 1000).getTime(),
+      );
+    });
+
+    it('should return date 2 minutes in the future', () => {
+      expect(userService.setUserBlockDate(4).getTime()).toBe(
+        new Date(new Date().getTime() + 2 * 60000).getTime(),
+      );
+    });
+
+    it('should return date 5 seconds in the future', () => {
+      expect(userService.setIpBlockDate(1).getTime()).toBe(
+        new Date().getTime(),
+      );
+    });
+
+    it('should return date 5 seconds in the future', () => {
+      expect(userService.setIpBlockDate(2).getTime()).toBe(
+        new Date(new Date().getTime() + 5 * 1000).getTime(),
+      );
+    });
+
+    it('should return date 10 seconds in the future', () => {
+      expect(userService.setIpBlockDate(3).getTime()).toBe(
+        new Date(new Date().getTime() + 10 * 1000).getTime(),
+      );
+    });
+
+    it('should return actual date', () => {
+      expect(userService.setIpBlockDate(4).getTime()).toBe(
+        new Date().getTime(),
+      );
+    });
+  });
+
   describe('User service methods', () => {
     it('should not register user if there is one with the same data passed to the method', () => {
       expect(
@@ -52,7 +273,7 @@ describe('User service without mock service', () => {
     it('should login user if there is login data and password matches', () => {
       expect(
         userService.loginUser({ username: 'test', password: 'test' }, ''),
-      ).resolves.toBe(true);
+      ).resolves.toBeInstanceOf(Object);
     });
 
     it('should change user password if there is password data and should also return new secret password', () => {

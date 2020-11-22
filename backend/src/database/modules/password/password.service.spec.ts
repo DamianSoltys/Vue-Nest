@@ -6,6 +6,7 @@ import {
   ConfigFakeService,
   QueryFakeService,
   UserFakeService,
+  AccountRepositoryFake,
 } from 'src/shared/mocks/class.mock';
 import { QueryService } from '../shared/query.service';
 import { UserService } from '../user/user.service';
@@ -21,6 +22,10 @@ describe('Password service', () => {
         {
           provide: 'UserRepository',
           useClass: UserRepostioryFake,
+        },
+        {
+          provide: 'AccountRepository',
+          useClass: AccountRepositoryFake,
         },
         {
           provide: 'PasswordRepository',

@@ -1,5 +1,14 @@
 import { AlgorithmTypeEnum } from 'src/database/constants/algorithmType.const';
 
+export const MockAccount = {
+  ipAddress: '::1',
+  blockDate: null,
+  isBlocked: false,
+  numberOfWrongLogins: null,
+  lastSuccessLogin: null,
+  lastFailureLogin: null,
+};
+
 export const MockPassword = {
   id: 1,
   password: 'test',

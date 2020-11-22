@@ -69,8 +69,8 @@ export class UserService {
     this.checkIfBlocked(searchResult, accountResult);
 
     if (!this.comparePassword(searchResult, password)) {
-      this.setUserLoginData(searchResult);
-      this.setIpLoginData(accountResult, remoteAddress);
+      await this.setUserLoginData(searchResult);
+      await this.setIpLoginData(accountResult, remoteAddress);
 
       throw new HttpException(
         {
@@ -80,8 +80,8 @@ export class UserService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     } else {
-      this.setUserSuccessLoginData(searchResult);
-      this.setIpSuccessLoginData(accountResult, remoteAddress);
+      await this.setUserSuccessLoginData(searchResult);
+      await this.setIpSuccessLoginData(accountResult, remoteAddress);
     }
 
     return searchResult;
@@ -115,9 +115,10 @@ export class UserService {
     return true;
   }
 
-  private checkIfBlocked(user: User, account: Account) {
+  //Make public to allow testing
+  public checkIfBlocked(user: User, account: Account) {
     if (!user || !account) {
-      return;
+      return null;
     }
 
     if (user.isBlocked || account.isBlocked) {
@@ -143,7 +144,8 @@ export class UserService {
     }
   }
 
-  private async setUserSuccessLoginData({ id }: User) {
+  //Make public to allow testing
+  public async setUserSuccessLoginData({ id }: User) {
     try {
       const changeResult = await this.userQB
         .update(User)
@@ -166,7 +168,8 @@ export class UserService {
     }
   }
 
-  private async setUserLoginData({ numberOfWrongLogins, id }: User) {
+  //Make public to allow testing
+  public async setUserLoginData({ numberOfWrongLogins, id }: User) {
     try {
       const wrongLogins = numberOfWrongLogins + 1;
       const changeResult = await this.userQB
@@ -191,7 +194,8 @@ export class UserService {
     }
   }
 
-  private setIpSuccessLoginData(account: Account, ipAddress?: string) {
+  //Make public to allow testing
+  public async setIpSuccessLoginData(account: Account, ipAddress?: string) {
     if (!account) {
       const insertResult = this.accQB
         .insert()
@@ -219,7 +223,8 @@ export class UserService {
     }
   }
 
-  private setIpLoginData(account: Account, ipAddress?: string) {
+  //Make public to allow testing
+  public async setIpLoginData(account: Account, ipAddress?: string) {
     if (!account) {
       const insertResult = this.accQB
         .insert()
@@ -252,17 +257,17 @@ export class UserService {
         .execute();
     }
   }
-
-  private setUserBlockDate(numberOfWrongLogins: number) {
+  //Make public to allow testing
+  public setUserBlockDate(numberOfWrongLogins: number) {
     switch (numberOfWrongLogins) {
       case 1: {
         return new Date();
       }
       case 2: {
-        return new Date(new Date().getTime() + 2 * 1000);
+        return new Date(new Date().getTime() + 5 * 1000);
       }
       case 3: {
-        return new Date(new Date().getTime() + 5 * 1000);
+        return new Date(new Date().getTime() + 10 * 1000);
       }
       default: {
         return new Date(new Date().getTime() + 2 * 60000);
@@ -270,13 +275,14 @@ export class UserService {
     }
   }
 
-  private setIpBlockDate(numberOfWrongLogins: number) {
+  //Make public to allow testing
+  public setIpBlockDate(numberOfWrongLogins: number) {
     switch (numberOfWrongLogins) {
       case 2: {
-        return new Date(new Date().getTime() + 2 * 1000);
+        return new Date(new Date().getTime() + 5 * 1000);
       }
       case 3: {
-        return new Date(new Date().getTime() + 5 * 1000);
+        return new Date(new Date().getTime() + 10 * 1000);
       }
       default: {
         return new Date();
