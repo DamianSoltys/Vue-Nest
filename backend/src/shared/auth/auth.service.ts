@@ -47,7 +47,9 @@ export class AuthService {
         username: payload.username,
         userId: user.id,
         lastFailureLogin: user.lastFailureLogin?.toLocaleString(),
-        lastSuccessLogin: user.lastSuccessLogin?.toLocaleString(),
+        lastSuccessLogin:
+          user.lastSuccessLogin?.toLocaleString() ||
+          new Date().toLocaleString(),
       };
     } catch {
       throw new HttpException(

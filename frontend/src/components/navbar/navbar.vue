@@ -47,7 +47,10 @@
         >
         <div class="mt-2">
           <p>Ostanie logowanie: {{ state.lastSuccessLogin }}</p>
-          <p>Ostania próba logowania: {{ state.lastFailureLogin }}</p>
+          <p>
+            Ostania próba logowania:
+            {{ state.lastFailureLogin || "Brak danych" }}
+          </p>
         </div>
       </div>
     </div>
