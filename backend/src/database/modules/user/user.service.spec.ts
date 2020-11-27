@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AlgorithmTypeEnum } from 'src/database/constants/algorithmType.const';
 import { User } from 'src/database/entities/user.entity';
+import MockDate from 'mockdate';
 import { Account } from 'src/database/entities/account.entity';
 import {
   UserRepostioryFake,
@@ -211,51 +212,83 @@ describe('User service without mock service', () => {
     });
 
     it('should return actual date', () => {
+      MockDate.set('2020-11-10');
+
       expect(userService.setUserBlockDate(1).getTime()).toBe(
         new Date().getTime(),
       );
+
+      MockDate.reset();
     });
 
     it('should return date 5 seconds in the future', () => {
+      MockDate.set('2020-11-10');
+
       expect(userService.setUserBlockDate(2).getTime()).toBe(
         new Date(new Date().getTime() + 5 * 1000).getTime(),
       );
+
+      MockDate.reset();
     });
 
     it('should return date 10 seconds in the future', () => {
+      MockDate.set('2020-11-10');
+
       expect(userService.setUserBlockDate(3).getTime()).toBe(
         new Date(new Date().getTime() + 10 * 1000).getTime(),
       );
+
+      MockDate.reset();
     });
 
     it('should return date 2 minutes in the future', () => {
+      MockDate.set('2020-11-10');
+
       expect(userService.setUserBlockDate(4).getTime()).toBe(
         new Date(new Date().getTime() + 2 * 60000).getTime(),
       );
+
+      MockDate.reset();
     });
 
     it('should return date 5 seconds in the future', () => {
+      MockDate.set('2020-11-10');
+
       expect(userService.setIpBlockDate(1).getTime()).toBe(
         new Date().getTime(),
       );
+
+      MockDate.reset();
     });
 
     it('should return date 5 seconds in the future', () => {
+      MockDate.set('2020-11-10');
+
       expect(userService.setIpBlockDate(2).getTime()).toBe(
         new Date(new Date().getTime() + 5 * 1000).getTime(),
       );
+
+      MockDate.reset();
     });
 
     it('should return date 10 seconds in the future', () => {
+      MockDate.set('2020-11-10');
+
       expect(userService.setIpBlockDate(3).getTime()).toBe(
         new Date(new Date().getTime() + 10 * 1000).getTime(),
       );
+
+      MockDate.reset();
     });
 
     it('should return actual date', () => {
+      MockDate.set('2020-11-10');
+
       expect(userService.setIpBlockDate(4).getTime()).toBe(
         new Date().getTime(),
       );
+
+      MockDate.reset();
     });
   });
 
