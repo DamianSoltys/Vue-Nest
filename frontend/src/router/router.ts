@@ -10,8 +10,13 @@ import LoginFormComponent from "../components/loginForm/loginForm.vue";
 import ChangePasswordFormComponent from "../components/changePasswordForm/changePasswordForm.vue";
 import AppLayout from "../App.vue";
 import store from "../store/vuex.config";
-import { IInitalState } from "@/store/store.interface";
+import {
+  IInitalState,
+  SiteModeEnum,
+  StoreActions
+} from "@/store/store.interface";
 import { computed, reactive } from "vue";
+import { toggleSiteMode } from "@/store/store.functions";
 
 const routes = [
   {
@@ -84,6 +89,18 @@ router.beforeEach((to, from, next) => {
 
   if (to.fullPath.includes("guest") && store.state.logged)
     next({ name: "HomePage" });
+
+  if (
+    (to.fullPath.includes("new-password") ||
+      to.fullPath.includes("change-password")) &&
+    store.state.mode === SiteModeEnum.READONLY
+  )
+    next({ name: "HomePage" });
+
+  if (!to.fullPath.includes("new-password") && store.state.editData) {
+    store.dispatch(StoreActions.SET_MODIFY_PASSWORD, null);
+    next({ name: to.name as string });
+  }
 
   next();
 });

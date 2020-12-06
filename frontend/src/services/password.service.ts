@@ -39,6 +39,38 @@ export class PasswordService {
     return request;
   }
 
+  public async updatePassword(passwordData: IPasswordData): Promise<any> {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
+    passwordData.secret = userService.getSecret();
+
+    const raw = JSON.stringify(passwordData);
+    const requestOptions: RequestInit = {
+      method: "PUT",
+      headers: myHeaders,
+      body: raw
+    };
+    const request: any = await fetch(
+      "http://localhost:3000/locker",
+      requestOptions
+    )
+      .then(response => errorService.handleError(response))
+      .then(response => response.json())
+      .then(result => {
+        errorService.handleResponse(
+          IResponseType.SUCCESS,
+          "Password updated successfully."
+        );
+        return result;
+      })
+      .catch(error =>
+        errorService.handleResponse(IResponseType.ERROR, error.message)
+      );
+
+    return request;
+  }
+
   public getPasswords(): IPasswordData[] {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
@@ -48,6 +80,27 @@ export class PasswordService {
     };
     const data: any = fetch(
       `http://localhost:3000/locker?userId=${userService.getUserId()}`,
+      requestOptions
+    )
+      .then(response => errorService.handleError(response))
+      .then(response => response.json())
+      .then(result => result)
+      .catch(error =>
+        errorService.handleResponse(IResponseType.ERROR, error.message)
+      );
+
+    return data;
+  }
+
+  public deletePassword(id: number): IPasswordData[] {
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
+    const requestOptions: RequestInit = {
+      method: "DELETE",
+      headers: myHeaders
+    };
+    const data: any = fetch(
+      `http://localhost:3000/locker?id=${id}`,
       requestOptions
     )
       .then(response => errorService.handleError(response))

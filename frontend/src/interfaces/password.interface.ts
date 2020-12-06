@@ -1,4 +1,5 @@
 export interface IPasswordData {
+  id?: number;
   secret: string | null;
   userId: number;
   webAddress: string;

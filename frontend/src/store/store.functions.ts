@@ -11,17 +11,32 @@ import {
 import { passwordService } from "@/services/password.service";
 import { userService } from "@/services/user.service";
 import { Action, ActionContext, createStore, Store } from "vuex";
-import { IInitalState, StoreMutations, StoreActions } from "./store.interface";
+import {
+  IInitalState,
+  StoreMutations,
+  StoreActions,
+  SiteModeEnum
+} from "./store.interface";
 import store from "../store/vuex.config";
+import router from "@/router/router";
 
-export const initialState = {
+export const initialState: IInitalState = {
   username: "User",
   logged: false,
   passwords: [],
   userId: null,
   lastFailureLogin: null,
-  lastSuccessLogin: null
+  lastSuccessLogin: null,
+  mode: SiteModeEnum.READONLY,
+  editData: null
 };
+
+export async function toggleSiteMode(
+  { commit, state }: ActionContext<IInitalState, IInitalState>,
+  payload: SiteModeEnum
+) {
+  commit(StoreMutations.TOGGLE_SITE_MODE, payload);
+}
 
 export async function loginUser(
   { commit, state }: ActionContext<IInitalState, IInitalState>,
@@ -80,6 +95,29 @@ export async function getPasswords({
   commit(StoreMutations.SET_PASSWORDS, data);
 
   return data;
+}
+
+export async function setModifyPassword(
+  { commit, state }: ActionContext<IInitalState, IInitalState>,
+  payload: IPasswordData
+) {
+  router.push("/password/new-password");
+  commit(StoreMutations.SET_MODIFY_PASSWORD, payload);
+}
+
+export async function updatePassword(
+  { commit, state }: ActionContext<IInitalState, IInitalState>,
+  payload: IPasswordData
+) {
+  const data = await passwordService.updatePassword(payload);
+}
+
+export async function deletePasword(
+  { commit, state }: ActionContext<IInitalState, IInitalState>,
+  payload: number
+) {
+  const data = await passwordService.deletePassword(payload);
+  store.dispatch(StoreActions.GET_PASSWORDS);
 }
 
 //TODO: implement

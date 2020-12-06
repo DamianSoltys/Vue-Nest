@@ -1,4 +1,4 @@
-import { IPasswordsList } from "@/interfaces/password.interface";
+import { IPasswordData, IPasswordsList } from "@/interfaces/password.interface";
 import { ILoginResponse } from "@/interfaces/user.interface";
 
 import { createStore } from "vuex";
@@ -12,9 +12,18 @@ import {
   addPassword,
   getPasswords,
   unblockAccount,
-  getDecryptedPassword
+  getDecryptedPassword,
+  toggleSiteMode,
+  setModifyPassword,
+  updatePassword,
+  deletePasword
 } from "./store.functions";
-import { IInitalState, StoreMutations, StoreActions } from "./store.interface";
+import {
+  IInitalState,
+  StoreMutations,
+  StoreActions,
+  SiteModeEnum
+} from "./store.interface";
 
 export default createStore({
   state(): IInitalState {
@@ -26,6 +35,18 @@ export default createStore({
       payload: IPasswordsList[]
     ) => {
       state.passwords = payload;
+    },
+    [StoreMutations.SET_MODIFY_PASSWORD]: (
+      state: IInitalState,
+      payload: IPasswordData
+    ) => {
+      state.editData = payload;
+    },
+    [StoreMutations.TOGGLE_SITE_MODE]: (
+      state: IInitalState,
+      payload: SiteModeEnum
+    ) => {
+      state.mode = payload;
     },
     [StoreMutations.CHANGE_LOGGED]: (
       state: IInitalState,
@@ -58,6 +79,14 @@ export default createStore({
     [StoreActions.UNBLOCK_ACCOUNT]: context => unblockAccount(context),
     [StoreActions.DECRYPT_PASSWORD]: (context, payload) =>
       getDecryptedPassword(context, payload),
+    [StoreActions.TOGGLE_SITE_MODE]: (context, payload) =>
+      toggleSiteMode(context, payload),
+    [StoreActions.SET_MODIFY_PASSWORD]: (context, payload) =>
+      setModifyPassword(context, payload),
+    [StoreActions.MODIFY_PASSWORD]: (context, payload) =>
+      updatePassword(context, payload),
+    [StoreActions.DELETE_PASSWORD]: (context, payload) =>
+      deletePasword(context, payload),
     [StoreActions.RESPONSE_ERROR]: () => {},
     [StoreActions.RESPONSE_SUCCESS]: () => {},
     [StoreActions.TOGGLE_UNBLOCK_BUTTON]: () => {}

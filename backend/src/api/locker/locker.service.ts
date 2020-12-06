@@ -21,6 +21,23 @@ export class LockerService {
     return data ? true : false;
   }
 
+  public updatePassword(passwordData: PasswordDto) {
+    const data = this.passwordDbService.updatePassword(passwordData);
+
+    return data ? true : false;
+  }
+
+  public deletePassword(passwordId: number) {
+    const data = this.passwordDbService.deletePassword(passwordId);
+
+    return data ? true : false;
+  }
+
+  public sharePassword(userId: number, passwordId: number) {
+    // const data = this.passwordDbService.addPassword(passwordData);
+    // return data ? true : false;
+  }
+
   public getDecryptedPasswordFromDatabase(query: IDecryptedPasswordQuery) {
     return this.passwordDbService.getDecryptedPassword(query);
   }

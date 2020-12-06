@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   HttpException,
   HttpStatus,
   Post,
+  Put,
   Query,
   Session,
   UseGuards,
@@ -21,12 +23,57 @@ export class LockerController {
   constructor(private readonly lockerService: LockerService) {}
 
   @Post()
-  async addPassword(
-    @Body() passwordDto: PasswordDto,
-    @Session() session: { password: string },
-  ) {
+  async addPassword(@Body() passwordDto: PasswordDto) {
     try {
       return await this.lockerService.addPasswordToDatabase(passwordDto);
+    } catch {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something went wrong, try again later',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Put()
+  async updatePassowrd(@Body() passwordDto: PasswordDto) {
+    try {
+      return await this.lockerService.updatePassword(passwordDto);
+    } catch {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something went wrong, try again later',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Delete()
+  async deletePassword(@Query('id') passwordId: number) {
+    try {
+      return await this.lockerService.deletePassword(passwordId);
+    } catch {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something went wrong, try again later',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('share')
+  async sharePassword(
+    @Query('userId') userId: number,
+    @Query('passwordId') passwordId: number,
+  ) {
+    try {
+      // return await this.lockerService.addPasswordToDatabase(passwordDto);
     } catch {
       throw new HttpException(
         {

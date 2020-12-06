@@ -41,7 +41,7 @@ export class AuthService {
       const encryptedPassword = CryptoJS.AES.encrypt(password, key).toString();
 
       return {
-        accessToken: this.jwtService.sign(payload),
+        accessToken: this.jwtService.sign(payload, { expiresIn: '2h' }),
         //TODO: session not working properly
         secretToken: encryptedPassword,
         username: payload.username,

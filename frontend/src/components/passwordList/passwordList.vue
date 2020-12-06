@@ -2,7 +2,7 @@
   <div class="d-flex mt-2">
     <div class="container">
       <div
-        class="row m-2"
+        class="row m-2 align-items-center"
         v-for="password of state.passwords"
         :key="password.id"
       >
@@ -18,13 +18,49 @@
         <div class="col-sm">
           {{ password.password ? password.password : "*********" }}
         </div>
-        <div class="col-sm">
+        <div class="col-sm d-flex">
           <button
-            class="btn btn-primary w-100"
+            class="btn btn-primary w-100 m-2"
             @click="showDecryptedPassword(password.id)"
           >
             {{ password.password ? "Ukryj" : "Zobacz" }}
           </button>
+          <span
+            class="m-2"
+            data-toggle="tooltip"
+            data-placement="bottom"
+            :title="
+              state.mode === SiteModeEnum.READONLY
+                ? 'Zmień tryb strony aby użyć tej funkcji'
+                : 'Edytuj dane'
+            "
+          >
+            <button
+              :disabled="state.mode === SiteModeEnum.READONLY"
+              class="btn btn-primary w-100"
+              @click="editPassword(password)"
+            >
+              Edytuj
+            </button>
+          </span>
+          <span
+            class="m-2"
+            data-toggle="tooltip"
+            data-placement="bottom"
+            :title="
+              state.mode === SiteModeEnum.READONLY
+                ? 'Zmień tryb strony aby użyć tej funkcji'
+                : 'Usuń dane'
+            "
+          >
+            <button
+              :disabled="state.mode === SiteModeEnum.READONLY"
+              class="btn btn-primary w-100"
+              @click="deletePassword(password.id)"
+            >
+              Usuń
+            </button>
+          </span>
         </div>
       </div>
     </div>
@@ -37,26 +73,66 @@
 </style>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, ref } from "vue";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  onUpdated,
+  reactive,
+  ref,
+  watch,
+  watchEffect,
+} from "vue";
 import { useStore } from "vuex";
-import { IInitalState, StoreActions } from "../../store/store.interface";
+import {
+  IInitalState,
+  StoreActions,
+  SiteModeEnum,
+} from "../../store/store.interface";
+import { Tooltip } from "bootstrap";
+import router from "../../router/router";
+import { IPasswordData } from "../../interfaces/password.interface";
 
 export default defineComponent({
   setup(props, { emit }) {
     const store = useStore();
     const storeState: IInitalState = store.state;
     const state = reactive({
-      passwords: computed(() => storeState.passwords)
+      passwords: computed(() => storeState.passwords),
+      mode: computed(() => storeState.mode),
+      editData: computed(() => storeState.editData),
+      tooltips: [] as Tooltip[],
     });
+
+    function setTooltips() {
+      const tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-toggle="tooltip"]')
+      );
+      state.tooltips = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new Tooltip(tooltipTriggerEl);
+      });
+    }
+
+    watch(
+      () => state.mode,
+      (mode, prevMode) => {
+        console.log(mode);
+        setTooltips();
+      }
+    );
 
     onMounted(() => {
       store.dispatch(StoreActions.GET_PASSWORDS);
     });
 
+    onUpdated(() => {
+      setTooltips();
+    });
+
     function getDecrytedData(passwordId: number) {
-      store.dispatch(StoreActions.DECRYPT_PASSWORD, passwordId).then(data => {
+      store.dispatch(StoreActions.DECRYPT_PASSWORD, passwordId).then((data) => {
         if (data) {
-          state.passwords.map(password => {
+          state.passwords.map((password) => {
             if (password.id === passwordId) {
               return (password.password = data);
             } else {
@@ -67,16 +143,36 @@ export default defineComponent({
       });
     }
 
+    function deletePassword(id: number) {
+      state.tooltips.forEach((tooltip) => {
+        tooltip.hide();
+      });
+      store.dispatch(StoreActions.DELETE_PASSWORD, id);
+    }
+
+    function editPassword(password: IPasswordData) {
+      state.tooltips.forEach((tooltip) => {
+        tooltip.hide();
+      });
+      store.dispatch(StoreActions.SET_MODIFY_PASSWORD, password);
+    }
+
     function showDecryptedPassword(passwordId: number) {
       const isDecrypted = state.passwords.find(
-        password => password.id == passwordId && password.password
+        (password) => password.id == passwordId && password.password
       );
 
       isDecrypted ? (isDecrypted.password = null) : getDecrytedData(passwordId);
     }
 
-    return { state, showDecryptedPassword };
-  }
+    return {
+      state,
+      showDecryptedPassword,
+      deletePassword,
+      editPassword,
+      SiteModeEnum,
+    };
+  },
 });
 </script>
 

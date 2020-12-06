@@ -24,14 +24,23 @@
               >Zobacz hasła</router-link
             >
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="state.mode === SiteModeEnum.EDIT">
             <router-link class="nav-link" to="/password/new-password"
               >Dodaj hasło</router-link
             >
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="state.mode === SiteModeEnum.EDIT">
             <router-link class="nav-link" to="/user/change-password"
               >Zmień hasło</router-link
+            >
+          </li>
+          <li class="nav-item">
+            <span @click="changeMode()" class="nav-link"
+              >Zmień tryb na:{{
+                state.mode === SiteModeEnum.READONLY
+                  ? SiteModeEnum.EDIT
+                  : SiteModeEnum.READONLY
+              }}</span
             >
           </li>
           <li class="nav-item">
@@ -65,7 +74,11 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
-import { IInitalState, StoreActions } from "../../store/store.interface";
+import {
+  IInitalState,
+  SiteModeEnum,
+  StoreActions,
+} from "../../store/store.interface";
 
 export default defineComponent({
   setup() {
@@ -75,6 +88,7 @@ export default defineComponent({
     const storeState: IInitalState = store.state;
     const state = reactive({
       list: true,
+      mode: computed(() => storeState.mode),
       logged: computed(() => storeState.logged),
       username: computed(() => storeState.username),
       lastFailureLogin: computed(() => storeState.lastFailureLogin),
@@ -89,7 +103,16 @@ export default defineComponent({
       store.dispatch(StoreActions.LOGOUT_USER);
     }
 
-    return { state, loginForm, logout };
+    function changeMode() {
+      store.dispatch(
+        StoreActions.TOGGLE_SITE_MODE,
+        state.mode === SiteModeEnum.READONLY
+          ? SiteModeEnum.EDIT
+          : SiteModeEnum.READONLY
+      );
+    }
+
+    return { state, loginForm, logout, changeMode, SiteModeEnum };
   },
 });
 </script>

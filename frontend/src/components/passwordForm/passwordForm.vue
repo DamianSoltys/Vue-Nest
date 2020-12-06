@@ -41,7 +41,7 @@
         class="btn btn-primary w-100"
         @click.prevent.once="handleSubmit()"
       >
-        Dodaj hasło
+        {{ !!state.editData ? "Zaktualizuj hasło" : "Dodaj hasło" }}
       </button>
     </form>
   </div>
@@ -64,22 +64,36 @@ export default defineComponent({
       webAddress: "",
       login: "",
       password: "",
-      description: ""
+      description: "",
     });
 
     const storeState: IInitalState = store.state;
     const state = reactive({
-      userId: computed(() => storeState.userId)
+      userId: computed(() => storeState.userId),
+      editData: computed(() => storeState.editData),
+    });
+
+    onMounted(() => {
+      if (state.editData) {
+        form.webAddress = state.editData.webAddress;
+        form.description = state.editData.description;
+        form.password = state.editData.password;
+        form.login = state.editData.login;
+      }
     });
 
     function handleSubmit() {
-      const data = { ...form, userId: state.userId };
+      const data = state.editData
+        ? { ...form, userId: state.userId, id: state.editData.id }
+        : { ...form, userId: state.userId };
 
-      store.dispatch(StoreActions.ADD_PASSWORD, data);
+      state.editData
+        ? store.dispatch(StoreActions.MODIFY_PASSWORD, data)
+        : store.dispatch(StoreActions.ADD_PASSWORD, data);
     }
 
     return { form, state, handleSubmit };
-  }
+  },
 });
 </script>
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IDecryptedPasswordQuery } from 'src/api/locker/locker.interface';
@@ -44,6 +44,75 @@ export class PasswordService {
     return insertResult;
   }
 
+  public async updatePassword(
+    passwordData: PasswordDto,
+  ): Promise<InsertResult> {
+    const userSearchResult = await this.queryService.getUserById(
+      passwordData.userId,
+    );
+    const passwordSearchResult = await this.queryService.getPasswordById(
+      passwordData.id,
+    );
+    let updateResult = null;
+
+    if (userSearchResult && passwordData.secret && passwordSearchResult) {
+      if (passwordData.password) {
+        const decryptedUserPassword = this.decryptSecret(passwordData.secret);
+        const encryptedPassword = CryptoJS.AES.encrypt(
+          passwordData.password,
+          decryptedUserPassword,
+        ).toString();
+        passwordData.password = encryptedPassword;
+      }
+      const updateData = {
+        webAddress: passwordData.webAddress
+          ? passwordData.webAddress
+          : passwordSearchResult.webAddress,
+        login: passwordData.login
+          ? passwordData.login
+          : passwordSearchResult.login,
+        password: passwordData.password
+          ? passwordData.password
+          : passwordSearchResult.password,
+        description: passwordData.description
+          ? passwordData.description
+          : passwordSearchResult.description,
+      };
+      const passwordId = passwordData.id;
+
+      updateResult = this.passQB
+        .update(Password)
+        .set(updateData)
+        .where('Password.id = :id', { id: passwordId })
+        .execute();
+    }
+
+    return updateResult;
+  }
+
+  public async deletePassword(passwordId: number) {
+    const searchResult = await this.queryService.getPasswordById(passwordId);
+    let deleteResult;
+
+    if (searchResult) {
+      const deleteResult = this.passQB
+        .delete()
+        .from(Password)
+        .where('Password.id = :id', { id: passwordId })
+        .execute();
+    } else {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'Password not found.',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return deleteResult;
+  }
+
   public async getDecryptedPassword(query: IDecryptedPasswordQuery) {
     const searchResult = await this.queryService.getPasswordById(
       query.passwordId,
@@ -61,28 +130,6 @@ export class PasswordService {
     ).toString(CryptoJS.enc.Utf8);
 
     return decryptedPassword;
-  }
-
-  //TODO: implement
-  public async changePassword(): Promise<InsertResult> {
-    const insertResult = this.passQB
-      .insert()
-      .into(Password)
-      .values({})
-      .execute();
-
-    return insertResult;
-  }
-
-  //TODO: implement
-  public async deletePassword(): Promise<InsertResult> {
-    const insertResult = this.passQB
-      .insert()
-      .into(Password)
-      .values({})
-      .execute();
-
-    return insertResult;
   }
 
   public decryptSecret(secret: string) {

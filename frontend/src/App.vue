@@ -13,7 +13,7 @@ import toastComponent from "./components/toast/toast.vue";
 
 export default defineComponent({
   components: { navbarComponent, toastComponent },
-  name: "App"
+  name: "App",
 });
 </script>
 
