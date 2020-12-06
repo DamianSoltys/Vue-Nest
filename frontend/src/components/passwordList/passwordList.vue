@@ -50,6 +50,26 @@
             :title="
               state.mode === SiteModeEnum.READONLY
                 ? 'Zmień tryb strony aby użyć tej funkcji'
+                : 'Udostępnij'
+            "
+          >
+            <button
+              data-toggle="modal"
+              data-target="#exampleModal"
+              :disabled="state.mode === SiteModeEnum.READONLY"
+              @click="state.sharePasssword = password"
+              class="btn btn-primary w-100"
+            >
+              Udostępnij
+            </button>
+          </span>
+          <span
+            class="m-2"
+            data-toggle="tooltip"
+            data-placement="bottom"
+            :title="
+              state.mode === SiteModeEnum.READONLY
+                ? 'Zmień tryb strony aby użyć tej funkcji'
                 : 'Usuń dane'
             "
           >
@@ -61,6 +81,60 @@
               Usuń
             </button>
           </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Udostępnij swoje hasło
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-section m-2">
+                <label class="form-label" for="email">Email użytkownika:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="email"
+                  v-model="form.email"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Anuluj
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="sharePassword(form.email)"
+            >
+              Udostępnij hasło
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -101,7 +175,11 @@ export default defineComponent({
       passwords: computed(() => storeState.passwords),
       mode: computed(() => storeState.mode),
       editData: computed(() => storeState.editData),
+      sharePasssword: null,
       tooltips: [] as Tooltip[],
+    });
+    const form = reactive({
+      email: "",
     });
 
     function setTooltips() {
@@ -112,14 +190,6 @@ export default defineComponent({
         return new Tooltip(tooltipTriggerEl);
       });
     }
-
-    watch(
-      () => state.mode,
-      (mode, prevMode) => {
-        console.log(mode);
-        setTooltips();
-      }
-    );
 
     onMounted(() => {
       store.dispatch(StoreActions.GET_PASSWORDS);
@@ -157,6 +227,14 @@ export default defineComponent({
       store.dispatch(StoreActions.SET_MODIFY_PASSWORD, password);
     }
 
+    function sharePassword(email: string) {
+      state.tooltips.forEach((tooltip) => {
+        tooltip.hide();
+      });
+      console.log(email);
+      console.log(state.sharePasssword);
+    }
+
     function showDecryptedPassword(passwordId: number) {
       const isDecrypted = state.passwords.find(
         (password) => password.id == passwordId && password.password
@@ -166,10 +244,12 @@ export default defineComponent({
     }
 
     return {
+      form,
       state,
       showDecryptedPassword,
       deletePassword,
       editPassword,
+      sharePassword,
       SiteModeEnum,
     };
   },
