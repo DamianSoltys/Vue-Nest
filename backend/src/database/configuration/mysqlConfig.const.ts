@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Account } from '../entities/account.entity';
-import { Password } from '../entities/password.entity';
+import { Password, SharedPassword } from '../entities/password.entity';
 import { User } from '../entities/user.entity';
 
 export const MysqlConfig: TypeOrmModuleOptions = {
@@ -10,6 +10,6 @@ export const MysqlConfig: TypeOrmModuleOptions = {
   username: process.env.MYSQL_USER || 'root',
   password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DATABASE || 'bsi',
-  entities: [User, Password, Account],
+  entities: [User, Password, Account, SharedPassword],
   synchronize: true,
 };

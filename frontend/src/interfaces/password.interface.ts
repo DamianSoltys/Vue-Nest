@@ -6,6 +6,7 @@ export interface IPasswordData {
   login: string;
   password: string;
   description: string;
+  isOwner?: boolean;
 }
 
 export interface IChangePasswordData {
@@ -13,6 +14,16 @@ export interface IChangePasswordData {
   password: string;
   oldPassword: string;
   algorithmType: string;
+}
+
+export interface IDecryptPasswordData {
+  passwordId: number;
+  userId: number;
+}
+
+export interface ISharePasswordData {
+  username: string;
+  passwordId: number;
 }
 
 export interface IPasswordsList {

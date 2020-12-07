@@ -12,7 +12,7 @@ export const MockAccount = {
 export const MockPassword = {
   id: 1,
   password: 'test',
-  user: 1,
+  userId: 1,
   webAddress: 'test',
   description: 'test',
   login: 'test',
@@ -22,7 +22,7 @@ export const MockPasswords = [
   {
     id: 1,
     password: 'test',
-    user: 1,
+    userId: 1,
     webAddress: 'test',
     description: 'test',
     login: 'test',
@@ -38,7 +38,7 @@ export const MockPasswords = [
   {
     id: 3,
     password: 'test',
-    user: 1,
+    userId: 1,
     webAddress: 'test',
     description: 'test',
     login: 'test',
@@ -46,7 +46,7 @@ export const MockPasswords = [
   {
     id: 4,
     password: 'test',
-    user: 1,
+    userId: 1,
     webAddress: 'test',
     description: 'test',
     login: 'test',

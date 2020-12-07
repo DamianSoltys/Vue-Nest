@@ -58,23 +58,5 @@ describe('Password service', () => {
         }),
       ).resolves.toBeInstanceOf(Object);
     });
-
-    it('should return decrypted password', () => {
-      jest
-        .spyOn(passwordService, 'decryptSecret')
-        .mockImplementation(() => 'decryptedPassword');
-
-      expect(
-        passwordService
-          .getDecryptedPassword({ userId: 1, passwordId: 1, secret: 'secret' })
-          .then(data => typeof data),
-      ).resolves.toBe('string');
-    });
-
-    it('should return decrypted data', () => {
-      const encryptedData = CryptoJS.AES.encrypt('password', 'test').toString();
-
-      expect(passwordService.decryptSecret(encryptedData)).toBe('password');
-    });
   });
 });

@@ -1,7 +1,9 @@
 import { IResponseType } from "@/interfaces/error.interface";
 import {
   IChangePasswordData,
-  IPasswordData
+  IDecryptPasswordData,
+  IPasswordData,
+  ISharePasswordData
 } from "@/interfaces/password.interface";
 import { errorService } from "./error.service";
 import { userService } from "./user.service";
@@ -92,6 +94,36 @@ export class PasswordService {
     return data;
   }
 
+  public sharePassword(sharePasswordData: ISharePasswordData) {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
+    const raw = JSON.stringify(sharePasswordData);
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw
+    };
+    const data: any = fetch(
+      `http://localhost:3000/locker/share`,
+      requestOptions
+    )
+      .then(response => errorService.handleError(response))
+      .then(response => response.json())
+      .then(result => {
+        errorService.handleResponse(
+          IResponseType.SUCCESS,
+          `Password shared successfully with ${sharePasswordData.username}.`
+        );
+        return result;
+      })
+      .catch(error =>
+        errorService.handleResponse(IResponseType.ERROR, error.message)
+      );
+
+    return data;
+  }
+
   public deletePassword(id: number): IPasswordData[] {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
@@ -105,7 +137,13 @@ export class PasswordService {
     )
       .then(response => errorService.handleError(response))
       .then(response => response.json())
-      .then(result => result)
+      .then(result => {
+        errorService.handleResponse(
+          IResponseType.SUCCESS,
+          "Password deleted successfully."
+        );
+        return result;
+      })
       .catch(error =>
         errorService.handleResponse(IResponseType.ERROR, error.message)
       );
@@ -113,7 +151,10 @@ export class PasswordService {
     return data;
   }
 
-  public async getDecryptedPassword(passwordId: string) {
+  public async getDecryptedPassword({
+    passwordId,
+    userId
+  }: IDecryptPasswordData) {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
     myHeaders.append("Secret", `${userService.getSecret()}`);
@@ -123,7 +164,7 @@ export class PasswordService {
     };
 
     const data = await fetch(
-      `http://localhost:3000/locker/decrypt?userId=${userService.getUserId()}&passwordId=${passwordId}}`,
+      `http://localhost:3000/locker/decrypt?userId=${userId}&passwordId=${passwordId}`,
       requestOptions
     )
       .then(response => errorService.handleError(response))

@@ -2,8 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IDecryptedPasswordQuery } from 'src/api/locker/locker.interface';
-import { PasswordDto } from 'src/database/dto/password.dto';
-import { Password } from 'src/database/entities/password.entity';
+import {
+  PasswordDto,
+  SharePasswordDataDto,
+} from 'src/database/dto/password.dto';
+import {
+  Password,
+  SharedPassword,
+} from 'src/database/entities/password.entity';
 import { InsertResult, Repository } from 'typeorm';
 import { QueryService } from '../shared/query.service';
 var CryptoJS = require('crypto-js');
@@ -11,10 +17,13 @@ var CryptoJS = require('crypto-js');
 @Injectable()
 export class PasswordService {
   private passQB = this.passwordRepository.createQueryBuilder();
+  private sPassQB = this.sharedPasswordRepository.createQueryBuilder();
 
   constructor(
     @InjectRepository(Password)
     private passwordRepository: Repository<Password>,
+    @InjectRepository(SharedPassword)
+    private sharedPasswordRepository: Repository<SharedPassword>,
     private configSerivce: ConfigService,
     private queryService: QueryService,
   ) {}
@@ -26,19 +35,48 @@ export class PasswordService {
     );
     let insertResult = null;
 
-    if (userSearchResult && passwordData.secret) {
-      const decryptedUserPassword = this.decryptSecret(passwordData.secret);
+    if (userSearchResult) {
       const encryptedPassword = CryptoJS.AES.encrypt(
         passwordData.password,
-        decryptedUserPassword,
+        userSearchResult.passwordHash,
       ).toString();
 
       passwordData.password = encryptedPassword;
-      insertResult = this.passQB
+      insertResult = await this.passQB
         .insert()
         .into(Password)
         .values({ ...passwordData, user: userSearchResult.id })
         .execute();
+    }
+
+    return insertResult;
+  }
+
+  public async sharePassword({
+    username,
+    passwordId,
+  }: SharePasswordDataDto): Promise<InsertResult> {
+    const userSearchResult = await this.queryService.getUserByLogin(username);
+    const passwordSearchResult = await this.queryService.getPasswordById(
+      passwordId,
+    );
+
+    let insertResult = null;
+
+    if (userSearchResult && passwordSearchResult) {
+      insertResult = await this.sPassQB
+        .insert()
+        .into(SharedPassword)
+        .values({ userId: userSearchResult.id, passwordId: passwordId })
+        .execute();
+    } else {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: `${userSearchResult ? 'User' : 'Password'} not found.`,
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     return insertResult;
@@ -57,13 +95,13 @@ export class PasswordService {
 
     if (userSearchResult && passwordData.secret && passwordSearchResult) {
       if (passwordData.password) {
-        const decryptedUserPassword = this.decryptSecret(passwordData.secret);
         const encryptedPassword = CryptoJS.AES.encrypt(
           passwordData.password,
-          decryptedUserPassword,
+          userSearchResult.passwordHash,
         ).toString();
         passwordData.password = encryptedPassword;
       }
+
       const updateData = {
         webAddress: passwordData.webAddress
           ? passwordData.webAddress
@@ -80,7 +118,7 @@ export class PasswordService {
       };
       const passwordId = passwordData.id;
 
-      updateResult = this.passQB
+      updateResult = await this.passQB
         .update(Password)
         .set(updateData)
         .where('Password.id = :id', { id: passwordId })
@@ -92,13 +130,24 @@ export class PasswordService {
 
   public async deletePassword(passwordId: number) {
     const searchResult = await this.queryService.getPasswordById(passwordId);
+    const passSearchResult = await this.queryService.getSharedPasswordById(
+      passwordId,
+    );
     let deleteResult;
 
+    if (passSearchResult) {
+      const deleteResult = await this.sPassQB
+        .delete()
+        .from(SharedPassword)
+        .where('passwordId = :passwordId', { passwordId })
+        .execute();
+    }
+
     if (searchResult) {
-      const deleteResult = this.passQB
+      const deleteResult = await this.passQB
         .delete()
         .from(Password)
-        .where('Password.id = :id', { id: passwordId })
+        .where('id = :id', { id: passwordId })
         .execute();
     } else {
       throw new HttpException(
@@ -114,27 +163,31 @@ export class PasswordService {
   }
 
   public async getDecryptedPassword(query: IDecryptedPasswordQuery) {
-    const searchResult = await this.queryService.getPasswordById(
+    const passwordSearchResult = await this.queryService.getPasswordById(
       query.passwordId,
       true,
     );
 
-    if (!searchResult && !query.secret) {
-      return false;
+    const userSearchResult = await this.queryService.getUserById(
+      query.userId,
+      true,
+    );
+
+    if (!passwordSearchResult && !userSearchResult) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'Cant decrypt password',
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    const decryptedUserPassword = this.decryptSecret(query.secret);
     const decryptedPassword = CryptoJS.AES.decrypt(
-      searchResult.password,
-      decryptedUserPassword,
+      passwordSearchResult.password,
+      userSearchResult.passwordHash,
     ).toString(CryptoJS.enc.Utf8);
 
     return decryptedPassword;
-  }
-
-  public decryptSecret(secret: string) {
-    const secretKey = this.configSerivce.get<string>('SECRET_KEY');
-
-    return CryptoJS.AES.decrypt(secret, secretKey).toString(CryptoJS.enc.Utf8);
   }
 }

@@ -7,3 +7,8 @@ export class PasswordDto {
   password: string;
   description: string;
 }
+
+export interface SharePasswordDataDto {
+  username: string;
+  passwordId: number;
+}

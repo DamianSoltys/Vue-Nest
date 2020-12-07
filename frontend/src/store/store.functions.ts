@@ -1,7 +1,9 @@
 import {
   IChangePasswordData,
+  IDecryptPasswordData,
   IPasswordData,
-  IPasswordsList
+  IPasswordsList,
+  ISharePasswordData
 } from "@/interfaces/password.interface";
 import {
   ILoginData,
@@ -123,7 +125,7 @@ export async function deletePasword(
 //TODO: implement
 export async function getDecryptedPassword(
   { commit, state }: ActionContext<IInitalState, IInitalState>,
-  payload: string
+  payload: IDecryptPasswordData
 ): Promise<string> {
   return await passwordService.getDecryptedPassword(payload);
 }
@@ -134,6 +136,13 @@ export async function changePassword(
   payload: IChangePasswordData
 ): Promise<boolean> {
   return await userService.changePassword(payload);
+}
+
+export async function sharePassword(
+  { commit, state }: ActionContext<IInitalState, IInitalState>,
+  payload: ISharePasswordData
+): Promise<boolean> {
+  return await passwordService.sharePassword(payload);
 }
 
 //TODO: implement

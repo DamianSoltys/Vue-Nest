@@ -1,10 +1,14 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { AlgorithmTypeEnum } from '../constants/algorithmType.const';
 import { Account } from './account.entity';
-import { Password } from './password.entity';
+import { Password, SharedPassword } from './password.entity';
 
 @Entity()
 export class User {
+  @OneToMany(
+    () => SharedPassword,
+    sharedPassword => sharedPassword.user,
+  )
   @OneToMany(
     () => Password,
     password => password.user,

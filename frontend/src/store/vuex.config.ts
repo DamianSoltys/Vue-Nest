@@ -16,7 +16,8 @@ import {
   toggleSiteMode,
   setModifyPassword,
   updatePassword,
-  deletePasword
+  deletePasword,
+  sharePassword
 } from "./store.functions";
 import {
   IInitalState,
@@ -87,6 +88,8 @@ export default createStore({
       updatePassword(context, payload),
     [StoreActions.DELETE_PASSWORD]: (context, payload) =>
       deletePasword(context, payload),
+    [StoreActions.SHARE_PASSWORD]: (context, payload) =>
+      sharePassword(context, payload),
     [StoreActions.RESPONSE_ERROR]: () => {},
     [StoreActions.RESPONSE_SUCCESS]: () => {},
     [StoreActions.TOGGLE_UNBLOCK_BUTTON]: () => {}

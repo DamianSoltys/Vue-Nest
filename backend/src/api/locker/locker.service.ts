@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PasswordDto } from 'src/database/dto/password.dto';
+import {
+  PasswordDto,
+  SharePasswordDataDto,
+} from 'src/database/dto/password.dto';
 import { PasswordService } from 'src/database/modules/password/password.service';
 import { QueryService } from 'src/database/modules/shared/query.service';
 import { IDecryptedPasswordQuery } from './locker.interface';
@@ -33,9 +36,9 @@ export class LockerService {
     return data ? true : false;
   }
 
-  public sharePassword(userId: number, passwordId: number) {
-    // const data = this.passwordDbService.addPassword(passwordData);
-    // return data ? true : false;
+  public sharePassword(passwordData: SharePasswordDataDto) {
+    const data = this.passwordDbService.sharePassword(passwordData);
+    return data ? true : false;
   }
 
   public getDecryptedPasswordFromDatabase(query: IDecryptedPasswordQuery) {

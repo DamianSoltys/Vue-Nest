@@ -12,7 +12,10 @@ import {
   Session,
   UseGuards,
 } from '@nestjs/common';
-import { PasswordDto } from 'src/database/dto/password.dto';
+import {
+  PasswordDto,
+  SharePasswordDataDto,
+} from 'src/database/dto/password.dto';
 import { JwtAuthGuard } from 'src/shared/auth/jwt-auth.guard';
 import { IDecryptedPasswordQuery } from './locker.interface';
 import { LockerService } from './locker.service';
@@ -67,13 +70,11 @@ export class LockerController {
     }
   }
 
-  @Get('share')
-  async sharePassword(
-    @Query('userId') userId: number,
-    @Query('passwordId') passwordId: number,
+  @Post('share') async sharePassword(
+    @Body() passwordData: SharePasswordDataDto,
   ) {
     try {
-      // return await this.lockerService.addPasswordToDatabase(passwordDto);
+      return await this.lockerService.sharePassword(passwordData);
     } catch {
       throw new HttpException(
         {

@@ -21,11 +21,17 @@
         <div class="col-sm d-flex">
           <button
             class="btn btn-primary w-100 m-2"
-            @click="showDecryptedPassword(password.id)"
+            @click="
+              showDecryptedPassword({
+                passwordId: password.id,
+                userId: password.userId,
+              })
+            "
           >
             {{ password.password ? "Ukryj" : "Zobacz" }}
           </button>
           <span
+            v-if="password.isOwner"
             class="m-2"
             data-toggle="tooltip"
             data-placement="bottom"
@@ -44,6 +50,7 @@
             </button>
           </span>
           <span
+            v-if="password.isOwner"
             class="m-2"
             data-toggle="tooltip"
             data-placement="bottom"
@@ -57,13 +64,14 @@
               data-toggle="modal"
               data-target="#exampleModal"
               :disabled="state.mode === SiteModeEnum.READONLY"
-              @click="state.sharePasssword = password"
+              @click="setSharePassword(password)"
               class="btn btn-primary w-100"
             >
               Udostępnij
             </button>
           </span>
           <span
+            v-if="password.isOwner"
             class="m-2"
             data-toggle="tooltip"
             data-placement="bottom"
@@ -109,12 +117,14 @@
           <div class="modal-body">
             <form>
               <div class="form-section m-2">
-                <label class="form-label" for="email">Email użytkownika:</label>
+                <label class="form-label" for="username"
+                  >Nazwa użytkownika:</label
+                >
                 <input
                   type="text"
                   class="form-control"
-                  name="email"
-                  v-model="form.email"
+                  name="username"
+                  v-model="form.username"
                 />
               </div>
             </form>
@@ -130,7 +140,7 @@
             <button
               type="button"
               class="btn btn-primary"
-              @click="sharePassword(form.email)"
+              @click="sharePassword(form.username)"
             >
               Udostępnij hasło
             </button>
@@ -165,7 +175,11 @@ import {
 } from "../../store/store.interface";
 import { Tooltip } from "bootstrap";
 import router from "../../router/router";
-import { IPasswordData } from "../../interfaces/password.interface";
+import {
+  IDecryptPasswordData,
+  IPasswordData,
+  ISharePasswordData,
+} from "../../interfaces/password.interface";
 
 export default defineComponent({
   setup(props, { emit }) {
@@ -175,11 +189,11 @@ export default defineComponent({
       passwords: computed(() => storeState.passwords),
       mode: computed(() => storeState.mode),
       editData: computed(() => storeState.editData),
-      sharePasssword: null,
+      sharePassword: {} as IPasswordData,
       tooltips: [] as Tooltip[],
     });
     const form = reactive({
-      email: "",
+      username: "",
     });
 
     function setTooltips() {
@@ -199,18 +213,20 @@ export default defineComponent({
       setTooltips();
     });
 
-    function getDecrytedData(passwordId: number) {
-      store.dispatch(StoreActions.DECRYPT_PASSWORD, passwordId).then((data) => {
-        if (data) {
-          state.passwords.map((password) => {
-            if (password.id === passwordId) {
-              return (password.password = data);
-            } else {
-              return (password.password = null);
-            }
-          });
-        }
-      });
+    function getDecrytedData({ passwordId, userId }: IDecryptPasswordData) {
+      store
+        .dispatch(StoreActions.DECRYPT_PASSWORD, { passwordId, userId })
+        .then((data) => {
+          if (data) {
+            state.passwords.map((password) => {
+              if (password.id === passwordId) {
+                return (password.password = data);
+              } else {
+                return (password.password = null);
+              }
+            });
+          }
+        });
     }
 
     function deletePassword(id: number) {
@@ -227,25 +243,36 @@ export default defineComponent({
       store.dispatch(StoreActions.SET_MODIFY_PASSWORD, password);
     }
 
-    function sharePassword(email: string) {
+    function sharePassword(username: string) {
+      const passwordData: ISharePasswordData = {
+        username,
+        passwordId: state.sharePassword.id || 0,
+      };
+
       state.tooltips.forEach((tooltip) => {
         tooltip.hide();
       });
-      console.log(email);
-      console.log(state.sharePasssword);
+      store.dispatch(StoreActions.SHARE_PASSWORD, passwordData);
     }
 
-    function showDecryptedPassword(passwordId: number) {
+    function showDecryptedPassword(decryptData: IDecryptPasswordData) {
       const isDecrypted = state.passwords.find(
-        (password) => password.id == passwordId && password.password
+        (password) => password.id == decryptData.passwordId && password.password
       );
 
-      isDecrypted ? (isDecrypted.password = null) : getDecrytedData(passwordId);
+      isDecrypted
+        ? (isDecrypted.password = null)
+        : getDecrytedData(decryptData);
+    }
+
+    function setSharePassword(password: IPasswordData) {
+      state.sharePassword = password;
     }
 
     return {
       form,
       state,
+      setSharePassword,
       showDecryptedPassword,
       deletePassword,
       editPassword,
