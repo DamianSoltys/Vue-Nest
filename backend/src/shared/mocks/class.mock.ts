@@ -47,6 +47,23 @@ export class UserRepostioryFake {
   }));
 }
 
+export class SharedRepositoryFake {
+  public createQueryBuilder = jest.fn(() => ({
+    delete: jest.fn().mockReturnThis(),
+    from: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    execute: jest.fn().mockReturnThis(),
+    insert: jest.fn().mockReturnThis(),
+    into: jest.fn().mockReturnThis(),
+    values: jest.fn().mockReturnThis(),
+    update: jest.fn().mockReturnThis(),
+    set: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    getMany: jest.fn().mockReturnValue(null), //TODO return value
+    getOne: jest.fn().mockReturnValue(null), //TODO return value
+  }));
+}
+
 export class PasswordRepositoryFake {
   public createQueryBuilder = jest.fn(() => ({
     delete: jest.fn().mockReturnThis(),
