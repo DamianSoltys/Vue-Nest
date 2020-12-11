@@ -14,6 +14,7 @@ import { InsertResult, Repository } from 'typeorm';
 import { QueryService } from '../shared/query.service';
 var CryptoJS = require('crypto-js');
 
+//TODO implement checking if user is owner
 @Injectable()
 export class PasswordService {
   private passQB = this.passwordRepository.createQueryBuilder();

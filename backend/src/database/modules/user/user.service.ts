@@ -18,6 +18,7 @@ interface PrimesHash {
   [index: number]: boolean;
 }
 
+//TODO implement checking if user is owner
 @Injectable()
 export class UserService {
   private userQB = this.userRepository.createQueryBuilder();
