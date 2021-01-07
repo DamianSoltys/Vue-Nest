@@ -1,3 +1,4 @@
+import { IDataChange, IHistoryLog } from "@/interfaces/history.interface";
 import { IPasswordData, IPasswordsList } from "@/interfaces/password.interface";
 
 export enum SiteModeEnum {
@@ -13,6 +14,8 @@ export interface IInitalState {
   lastSuccessLogin: string | null;
   mode: SiteModeEnum;
   editData: IPasswordData | null;
+  history: IHistoryLog[];
+  dataChanges: IDataChange[];
 }
 
 export const StoreActions = {
@@ -26,6 +29,8 @@ export const StoreActions = {
   CHANGE_PASSWORD: "[USER]CHANGE_PASSWORD",
   ADD_PASSWORD: "[PASSWORD]ADD_PASSWORD",
   GET_PASSWORDS: "[PASSWORD]GET_PASSWORDS",
+  GET_HISTORY: "[HISTORY]GET_HISTORY",
+  GET_CHANGES: "[PASSWORD]GET_CHANGES",
   SET_MODIFY_PASSWORD: "[PASSWORD]SET_MODIFY_PASSWORD",
   MODIFY_PASSWORD: "[PASSWORD]MODIFY_PASSWORD",
   SHARE_PASSWORD: "[PASSWORD]SHARE_PASSWORD",
@@ -37,6 +42,8 @@ export const StoreActions = {
 
 export const StoreMutations = {
   SET_PASSWORDS: "SET_PASSWORDS",
+  SET_HISTORY: "SET_HISTORY",
+  SET_CHANGES: "SET_CHANGES",
   SET_MODIFY_PASSWORD: "SET_MODIFY_PASSWORD",
   TOGGLE_SITE_MODE: "TOGGLE_SITE_MODE",
   CHANGE_LOGGED: "CHANGE_LOGGED",

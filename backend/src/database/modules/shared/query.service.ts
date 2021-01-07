@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from 'src/database/entities/account.entity';
+import { DataChange, HistoryLog } from 'src/database/entities/data.entity';
 import {
   Password,
   SharedPassword,
@@ -14,6 +15,8 @@ export class QueryService {
   private passQB = this.passwordRepository.createQueryBuilder();
   private sPassQB = this.sharedPasswordRepository.createQueryBuilder();
   private accQB = this.accountRepository.createQueryBuilder();
+  private historyQB = this.historyRepository.createQueryBuilder();
+  private dataQB = this.dataRepository.createQueryBuilder();
 
   constructor(
     @InjectRepository(Password)
@@ -24,6 +27,10 @@ export class QueryService {
     private userRepository: Repository<User>,
     @InjectRepository(Account)
     private accountRepository: Repository<Account>,
+    @InjectRepository(HistoryLog)
+    private historyRepository: Repository<HistoryLog>,
+    @InjectRepository(DataChange)
+    private dataRepository: Repository<DataChange>,
   ) {}
 
   //TODO: implement
@@ -47,7 +54,7 @@ export class QueryService {
         return (result.password = null);
       });
     }
-    const sharedPassword = await this.getSharedPasswordDataById(id);
+    const sharedPassword = await this.getSharedPasswordsDataById(id);
 
     searchResult?.map(password => {
       password.isOwner = true;
@@ -59,6 +66,35 @@ export class QueryService {
     searchResult = sharedPassword
       ? [...searchResult, ...sharedPassword]
       : [...searchResult];
+
+    return searchResult;
+  }
+
+  public async getHistoryLog(userId: number): Promise<HistoryLog[]> {
+    let searchResult: HistoryLog[] = null;
+
+    searchResult = await this.historyQB
+      .where('HistoryLog.userId = :userId', { userId })
+      .getMany();
+
+    return searchResult;
+  }
+
+  public async getDataChanges(recordId: number): Promise<DataChange[]> {
+    let searchResult: DataChange[] = null;
+
+    searchResult = await this.dataQB
+      .where('DataChange.recordId = :recordId', { recordId })
+      .getMany();
+
+    if (!!searchResult.length) {
+      searchResult = searchResult.sort(
+        (a, b) =>
+          new Date(b.initializeDate).getTime() -
+          new Date(a.initializeDate).getTime(),
+      );
+      searchResult = searchResult.slice(0, 3);
+    }
 
     return searchResult;
   }
@@ -95,7 +131,7 @@ export class QueryService {
     return searchResult;
   }
 
-  public async getSharedPasswordDataById(userId: number): Promise<Password[]> {
+  public async getSharedPasswordsDataById(userId: number): Promise<Password[]> {
     try {
       const searchResult = await this.passwordRepository
         .createQueryBuilder('password')

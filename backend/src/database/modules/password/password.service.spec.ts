@@ -4,15 +4,12 @@ import {
   UserRepostioryFake,
   PasswordRepositoryFake,
   ConfigFakeService,
-  QueryFakeService,
-  UserFakeService,
   AccountRepositoryFake,
   SharedRepositoryFake,
 } from 'src/shared/mocks/class.mock';
 import { QueryService } from '../shared/query.service';
 import { UserService } from '../user/user.service';
 import { PasswordService } from './password.service';
-var CryptoJS = require('crypto-js');
 
 describe('Password service', () => {
   let passwordService: PasswordService;

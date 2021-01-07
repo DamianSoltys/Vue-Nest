@@ -1,3 +1,4 @@
+import { IDataChange, IHistoryLog } from "@/interfaces/history.interface";
 import { IPasswordData, IPasswordsList } from "@/interfaces/password.interface";
 import { ILoginResponse } from "@/interfaces/user.interface";
 
@@ -17,7 +18,9 @@ import {
   setModifyPassword,
   updatePassword,
   deletePasword,
-  sharePassword
+  sharePassword,
+  getHistory,
+  getDataChanges
 } from "./store.functions";
 import {
   IInitalState,
@@ -36,6 +39,18 @@ export default createStore({
       payload: IPasswordsList[]
     ) => {
       state.passwords = payload;
+    },
+    [StoreMutations.SET_HISTORY]: (
+      state: IInitalState,
+      payload: IHistoryLog[]
+    ) => {
+      state.history = payload;
+    },
+    [StoreMutations.SET_CHANGES]: (
+      state: IInitalState,
+      payload: IDataChange[]
+    ) => {
+      state.dataChanges = payload;
     },
     [StoreMutations.SET_MODIFY_PASSWORD]: (
       state: IInitalState,
@@ -77,6 +92,9 @@ export default createStore({
     [StoreActions.ADD_PASSWORD]: (context, payload) =>
       addPassword(context, payload),
     [StoreActions.GET_PASSWORDS]: context => getPasswords(context),
+    [StoreActions.GET_HISTORY]: context => getHistory(context),
+    [StoreActions.GET_CHANGES]: (context, payload) =>
+      getDataChanges(context, payload),
     [StoreActions.UNBLOCK_ACCOUNT]: context => unblockAccount(context),
     [StoreActions.DECRYPT_PASSWORD]: (context, payload) =>
       getDecryptedPassword(context, payload),

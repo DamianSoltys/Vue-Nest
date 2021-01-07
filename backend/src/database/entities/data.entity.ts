@@ -18,7 +18,7 @@ export class HistoryLog {
   user: number;
 
   @Column()
-  InitializeDate: Date;
+  initializeDate: Date;
 
   @Column()
   functionType: FunctionTypeEnum;
@@ -40,7 +40,7 @@ export class DataChange {
   user: number;
 
   @Column()
-  InitializeDate: Date;
+  initializeDate: Date;
 
   @Column()
   functionType: FunctionTypeEnum;
@@ -49,8 +49,8 @@ export class DataChange {
   recordId: number;
 
   @Column()
-  previousValue: any;
+  previousValue: string;
 
   @Column()
-  presentValue: any;
+  presentValue: string;
 }

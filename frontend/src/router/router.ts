@@ -5,6 +5,7 @@ import PasswordPageComponent from "../pages/passwordPage/passwordPage.vue";
 import UserPageComponent from "../pages/userPage/userPage.vue";
 import AddPasswordComponent from "../components/passwordForm/passwordForm.vue";
 import PasswordListComponent from "../components/passwordList/passwordList.vue";
+import HistoryListComponent from "../components/historyList/historyList.vue";
 import RegisterFormComponent from "../components/registerForm/registerForm.vue";
 import LoginFormComponent from "../components/loginForm/loginForm.vue";
 import ChangePasswordFormComponent from "../components/changePasswordForm/changePasswordForm.vue";
@@ -46,6 +47,11 @@ const routes = [
     path: "/home",
     name: "HomePage",
     component: HomePageComponent
+  },
+  {
+    path: "/history",
+    name: "HistoryList",
+    component: HistoryListComponent
   },
   {
     path: "/password",

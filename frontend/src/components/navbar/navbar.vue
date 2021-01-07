@@ -24,6 +24,11 @@
               >Zobacz hasła</router-link
             >
           </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/history"
+              >Zobacz historie</router-link
+            >
+          </li>
           <li class="nav-item" v-if="state.mode === SiteModeEnum.EDIT">
             <router-link class="nav-link" to="/password/new-password"
               >Dodaj hasło</router-link

@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { AlgorithmTypeEnum } from '../constants/algorithmType.const';
-import { Account } from './account.entity';
 import { Password, SharedPassword } from './password.entity';
 
 @Entity()
@@ -14,7 +13,7 @@ export class User {
     password => password.user,
   )
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column({ length: 100 })
   username: string;

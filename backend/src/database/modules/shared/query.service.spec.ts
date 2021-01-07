@@ -4,7 +4,6 @@ import {
   UserRepostioryFake,
   PasswordRepositoryFake,
   ConfigFakeService,
-  QueryFakeService,
   UserFakeService,
   AccountRepositoryFake,
   SharedRepositoryFake,

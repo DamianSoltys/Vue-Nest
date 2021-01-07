@@ -2,15 +2,18 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IDecryptedPasswordQuery } from 'src/api/locker/locker.interface';
+import { FunctionTypeEnum } from 'src/database/constants/accessType.const';
 import {
   PasswordDto,
   SharePasswordDataDto,
 } from 'src/database/dto/password.dto';
+import { DataChange } from 'src/database/entities/data.entity';
 import {
   Password,
   SharedPassword,
 } from 'src/database/entities/password.entity';
 import { InsertResult, Repository } from 'typeorm';
+import { HistoryService } from '../history/history.service';
 import { QueryService } from '../shared/query.service';
 var CryptoJS = require('crypto-js');
 
@@ -26,6 +29,7 @@ export class PasswordService {
     @InjectRepository(SharedPassword)
     private sharedPasswordRepository: Repository<SharedPassword>,
     private configSerivce: ConfigService,
+    private history: HistoryService,
     private queryService: QueryService,
   ) {}
 
@@ -50,6 +54,12 @@ export class PasswordService {
         .execute();
     }
 
+    if (insertResult) {
+      this.history.addHistoryLog(
+        FunctionTypeEnum.ADD_PASSWORD,
+        userSearchResult.id,
+      );
+    }
     return insertResult;
   }
 
@@ -70,6 +80,13 @@ export class PasswordService {
         .into(SharedPassword)
         .values({ userId: userSearchResult.id, passwordId: passwordId })
         .execute();
+
+      if (insertResult) {
+        this.history.addHistoryLog(
+          FunctionTypeEnum.SHARE_PASSWORD,
+          userSearchResult.id,
+        );
+      }
     } else {
       throw new HttpException(
         {
@@ -126,6 +143,13 @@ export class PasswordService {
         .execute();
     }
 
+    if (updateResult) {
+      this.history.addHistoryLog(
+        FunctionTypeEnum.MODIFY_PASSWORD,
+        userSearchResult.id,
+      );
+    }
+
     return updateResult;
   }
 
@@ -150,6 +174,13 @@ export class PasswordService {
         .from(Password)
         .where('id = :id', { id: passwordId })
         .execute();
+
+      if (deleteResult) {
+        this.history.addHistoryLog(
+          FunctionTypeEnum.SHARE_PASSWORD,
+          passSearchResult.userId,
+        );
+      }
     } else {
       throw new HttpException(
         {
@@ -189,6 +220,24 @@ export class PasswordService {
       userSearchResult.passwordHash,
     ).toString(CryptoJS.enc.Utf8);
 
+    if (decryptedPassword) {
+      this.history.addHistoryLog(
+        FunctionTypeEnum.SHOW_PASSWORD,
+        userSearchResult.id,
+      );
+    }
+
     return decryptedPassword;
+  }
+
+  public async revertPasswordData(data: DataChange) {
+    const previousValue: Password = JSON.parse(data.previousValue);
+    const presentValue: Password = JSON.parse(data.presentValue);
+
+    if (presentValue) {
+      //ModifyPassword
+    } else {
+      //AddPassword
+    }
   }
 }

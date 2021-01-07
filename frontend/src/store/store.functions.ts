@@ -21,6 +21,8 @@ import {
 } from "./store.interface";
 import store from "../store/vuex.config";
 import router from "@/router/router";
+import { IDataChange, IHistoryLog } from "@/interfaces/history.interface";
+import { historyService } from "@/services/history.service";
 
 export const initialState: IInitalState = {
   username: "User",
@@ -30,7 +32,9 @@ export const initialState: IInitalState = {
   lastFailureLogin: null,
   lastSuccessLogin: null,
   mode: SiteModeEnum.READONLY,
-  editData: null
+  editData: null,
+  history: [],
+  dataChanges: []
 };
 
 export async function toggleSiteMode(
@@ -95,6 +99,28 @@ export async function getPasswords({
   const data = await passwordService.getPasswords();
 
   commit(StoreMutations.SET_PASSWORDS, data);
+
+  return data;
+}
+
+export async function getHistory({
+  commit,
+  state
+}: ActionContext<IInitalState, IInitalState>): Promise<IHistoryLog[]> {
+  const data = await historyService.getHistory();
+
+  commit(StoreMutations.SET_HISTORY, data);
+
+  return data;
+}
+
+export async function getDataChanges(
+  { commit, state }: ActionContext<IInitalState, IInitalState>,
+  payload: number
+): Promise<IDataChange[]> {
+  const data = await historyService.getDataChanges(payload);
+
+  commit(StoreMutations.SET_CHANGES, data);
 
   return data;
 }
