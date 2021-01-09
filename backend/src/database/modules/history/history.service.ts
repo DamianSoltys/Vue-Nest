@@ -41,20 +41,22 @@ export class HistoryService {
 
   public async addDataChange(
     functionType: FunctionTypeEnum,
-    userId: number,
     previousValue: any,
     presentValue: any,
   ) {
     try {
+      const previousData = JSON.parse(previousValue) as Password;
+
       return await this.changeQB
         .insert()
         .into(DataChange)
         .values({
-          userId,
+          userId:previousData.userId,
           functionType,
           initializeDate: new Date(),
           previousValue,
           presentValue,
+          recordId:previousData.id
         })
         .execute();
     } catch {

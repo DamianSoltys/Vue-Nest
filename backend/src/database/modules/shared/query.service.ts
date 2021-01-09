@@ -86,15 +86,14 @@ export class QueryService {
     searchResult = await this.dataQB
       .where('DataChange.recordId = :recordId', { recordId })
       .getMany();
+    searchResult.map(dataChange=>{
+      const {password:presentPassword,...presentData}: Password = JSON.parse(dataChange.presentValue);
+      const {password:previousPassword,...previousData}: Password = JSON.parse(dataChange.previousValue);
 
-    if (!!searchResult.length) {
-      searchResult = searchResult.sort(
-        (a, b) =>
-          new Date(b.initializeDate).getTime() -
-          new Date(a.initializeDate).getTime(),
-      );
-      searchResult = searchResult.slice(0, 3);
-    }
+      dataChange.presentValue = JSON.stringify(presentData);
+      dataChange.previousValue = JSON.stringify(previousData);
+      return dataChange;
+    })
 
     return searchResult;
   }

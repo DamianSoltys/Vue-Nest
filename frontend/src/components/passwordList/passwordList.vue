@@ -89,6 +89,19 @@
               Usuń
             </button>
           </span>
+          <div class="btn-group w-100 m-2 change-dropdown">
+            <button type="button" class="btn btn-primary" @click="getChanges(password.id)">Zobacz historię</button>
+            <button v-if="state.actualPasswordDataId === password.id" type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" :disabled="!state.dataChanges.length"></button>
+            <ul class="dropdown-menu">
+              <li v-for="dataChanges of state.dataChanges" :key="dataChanges.id">
+                <a class="dropdown-item">
+                  <p>id: {{dataChanges.id}}</p>
+                  <p>typ: {{dataChanges.functionType}}</p>
+                  <p class="json-data">dane: {{dataChanges.previousValue}}</p>
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -173,7 +186,7 @@ import {
   StoreActions,
   SiteModeEnum,
 } from "../../store/store.interface";
-import { Tooltip } from "bootstrap";
+import { Dropdown, Tooltip } from "bootstrap";
 import router from "../../router/router";
 import {
   IDecryptPasswordData,
@@ -189,8 +202,11 @@ export default defineComponent({
       passwords: computed(() => storeState.passwords),
       mode: computed(() => storeState.mode),
       editData: computed(() => storeState.editData),
+      dataChanges: computed(() => storeState.dataChanges),
       sharePassword: {} as IPasswordData,
       tooltips: [] as Tooltip[],
+      dropdowns: [] as Dropdown[],
+      actualPasswordDataId:-1,
     });
     const form = reactive({
       username: "",
@@ -205,13 +221,29 @@ export default defineComponent({
       });
     }
 
+    function setDropdowns() {
+      const dropdownTriggerList = [].slice.call(
+        document.querySelectorAll('.dropdown-toggle')
+      );
+      state.dropdowns = dropdownTriggerList.map(function (dropdownTriggerEl) {
+        return new Dropdown(dropdownTriggerEl);
+      });
+    }
+
     onMounted(() => {
       store.dispatch(StoreActions.GET_PASSWORDS);
     });
 
     onUpdated(() => {
       setTooltips();
+      setDropdowns();
+      console.log(state)
     });
+
+    function getChanges(recordId: number) {
+      store.dispatch(StoreActions.GET_CHANGES, recordId);
+      state.actualPasswordDataId = recordId;
+    }
 
     function getDecrytedData({ passwordId, userId }: IDecryptPasswordData) {
       store
@@ -230,6 +262,7 @@ export default defineComponent({
     }
 
     function deletePassword(id: number) {
+      // TODO refactor - must be a better way to do this
       state.tooltips.forEach((tooltip) => {
         tooltip.hide();
       });
@@ -237,6 +270,7 @@ export default defineComponent({
     }
 
     function editPassword(password: IPasswordData) {
+      // TODO refactor - must be a better way to do this
       state.tooltips.forEach((tooltip) => {
         tooltip.hide();
       });
@@ -248,7 +282,7 @@ export default defineComponent({
         username,
         passwordId: state.sharePassword.id || 0,
       };
-
+      // TODO refactor - must be a better way to do this
       state.tooltips.forEach((tooltip) => {
         tooltip.hide();
       });
@@ -277,6 +311,7 @@ export default defineComponent({
       deletePassword,
       editPassword,
       sharePassword,
+      getChanges,
       SiteModeEnum,
     };
   },

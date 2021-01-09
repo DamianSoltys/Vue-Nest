@@ -109,7 +109,11 @@ export class PasswordService {
     const passwordSearchResult = await this.queryService.getPasswordById(
       passwordData.id,
     );
+    const passwordSearchResultWithPassword = await this.queryService.getPasswordById(
+      passwordData.id,true
+    );
     let updateResult = null;
+    let updateData = null;
 
     if (userSearchResult && passwordData.secret && passwordSearchResult) {
       if (passwordData.password) {
@@ -120,7 +124,7 @@ export class PasswordService {
         passwordData.password = encryptedPassword;
       }
 
-      const updateData = {
+      updateData = {
         webAddress: passwordData.webAddress
           ? passwordData.webAddress
           : passwordSearchResult.webAddress,
@@ -144,6 +148,14 @@ export class PasswordService {
     }
 
     if (updateResult) {
+      const passwordSearchResultWithPasswordAfter = await this.queryService.getPasswordById(
+        passwordData.id,true
+      );
+      
+      const previousValue = JSON.stringify(passwordSearchResultWithPassword);
+      const presentValue = JSON.stringify(passwordSearchResultWithPasswordAfter);
+      
+      this.history.addDataChange(FunctionTypeEnum.MODIFY_PASSWORD,previousValue,presentValue)
       this.history.addHistoryLog(
         FunctionTypeEnum.MODIFY_PASSWORD,
         userSearchResult.id,
@@ -157,6 +169,9 @@ export class PasswordService {
     const searchResult = await this.queryService.getPasswordById(passwordId);
     const passSearchResult = await this.queryService.getSharedPasswordById(
       passwordId,
+    );
+    const passwordSearchResultWithPassword = await this.queryService.getPasswordById(
+      passwordId,true
     );
     let deleteResult;
 
@@ -176,9 +191,13 @@ export class PasswordService {
         .execute();
 
       if (deleteResult) {
+        const previousValue = JSON.stringify(passwordSearchResultWithPassword);
+        const presentValue = JSON.stringify(null);
+
+        this.history.addDataChange(FunctionTypeEnum.DELETE_PASSWORD,previousValue,presentValue)
         this.history.addHistoryLog(
-          FunctionTypeEnum.SHARE_PASSWORD,
-          passSearchResult.userId,
+          FunctionTypeEnum.DELETE_PASSWORD,
+          passwordSearchResultWithPassword.userId,
         );
       }
     } else {
