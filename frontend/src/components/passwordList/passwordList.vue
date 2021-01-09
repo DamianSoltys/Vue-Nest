@@ -98,6 +98,7 @@
                   <p>id: {{dataChanges.id}}</p>
                   <p>typ: {{dataChanges.functionType}}</p>
                   <p class="json-data">dane: {{dataChanges.previousValue}}</p>
+                  <button class="btn btn-primary" @click="revertData(password.id)">Cofnij</button>
                 </a>
               </li>
             </ul>
@@ -277,6 +278,10 @@ export default defineComponent({
       store.dispatch(StoreActions.SET_MODIFY_PASSWORD, password);
     }
 
+    function revertData(recordId: number) {
+      store.dispatch(StoreActions.REVERT_CHANGES, recordId);
+    }
+
     function sharePassword(username: string) {
       const passwordData: ISharePasswordData = {
         username,
@@ -313,6 +318,7 @@ export default defineComponent({
       sharePassword,
       getChanges,
       SiteModeEnum,
+      revertData,
     };
   },
 });

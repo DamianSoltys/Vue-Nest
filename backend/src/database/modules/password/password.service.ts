@@ -34,19 +34,23 @@ export class PasswordService {
   ) {}
 
   //TODO: implement
-  public async addPassword(passwordData: PasswordDto): Promise<InsertResult> {
+  public async addPassword(passwordData: PasswordDto | Password,isHistory?:boolean): Promise<InsertResult> {
+    const userId = isHistory?passwordData.userId:passwordData.userId;
     const userSearchResult = await this.queryService.getUserById(
-      passwordData.userId,
+      userId,
     );
     let insertResult = null;
 
     if (userSearchResult) {
-      const encryptedPassword = CryptoJS.AES.encrypt(
-        passwordData.password,
-        userSearchResult.passwordHash,
-      ).toString();
+      if(!isHistory) {
+        const encryptedPassword = CryptoJS.AES.encrypt(
+          passwordData.password,
+          userSearchResult.passwordHash,
+        ).toString();
+  
+        passwordData.password = encryptedPassword;
+      }
 
-      passwordData.password = encryptedPassword;
       insertResult = await this.passQB
         .insert()
         .into(Password)
@@ -101,7 +105,7 @@ export class PasswordService {
   }
 
   public async updatePassword(
-    passwordData: PasswordDto,
+    passwordData: PasswordDto | Password, isHistory?:boolean
   ): Promise<InsertResult> {
     const userSearchResult = await this.queryService.getUserById(
       passwordData.userId,
@@ -115,8 +119,8 @@ export class PasswordService {
     let updateResult = null;
     let updateData = null;
 
-    if (userSearchResult && passwordData.secret && passwordSearchResult) {
-      if (passwordData.password) {
+    if (userSearchResult && ((passwordData as PasswordDto).secret || isHistory) && passwordSearchResult) {
+      if (passwordData.password && !isHistory) {
         const encryptedPassword = CryptoJS.AES.encrypt(
           passwordData.password,
           userSearchResult.passwordHash,
@@ -249,14 +253,18 @@ export class PasswordService {
     return decryptedPassword;
   }
 
-  public async revertPasswordData(data: DataChange) {
-    const previousValue: Password = JSON.parse(data.previousValue);
-    const presentValue: Password = JSON.parse(data.presentValue);
+  public async revertPasswordData(recordId: number) {
+    const searchResult = await this.queryService.getDataChange(recordId,true);
 
-    if (presentValue) {
-      //ModifyPassword
-    } else {
-      //AddPassword
+    if(searchResult) {
+      const previousValue: Password = JSON.parse(searchResult.previousValue);
+      const presentValue: Password = JSON.parse(searchResult.presentValue);
+
+      if (presentValue) {
+        return this.updatePassword(presentValue,true);
+      } else {
+        return this.addPassword(previousValue,true)
+      }
     }
   }
 }

@@ -1,8 +1,10 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -34,6 +36,21 @@ export class HistoryController {
   async getDataChanges(@Query('recordId') id: number) {
     try {
       return await this.history.getDataChanges(id);
+    } catch {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something went wrong, try again later',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('changes')
+  async modifyData(@Body() recordId: number) {
+    try {
+      return await this.history.modifyData(recordId);
     } catch {
       throw new HttpException(
         {

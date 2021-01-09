@@ -80,20 +80,41 @@ export class QueryService {
     return searchResult;
   }
 
-  public async getDataChanges(recordId: number): Promise<DataChange[]> {
+  public async getDataChanges(recordId: number,withPassword?:boolean): Promise<DataChange[]> {
     let searchResult: DataChange[] = null;
 
     searchResult = await this.dataQB
       .where('DataChange.recordId = :recordId', { recordId })
       .getMany();
-    searchResult.map(dataChange=>{
-      const {password:presentPassword,...presentData}: Password = JSON.parse(dataChange.presentValue);
-      const {password:previousPassword,...previousData}: Password = JSON.parse(dataChange.previousValue);
 
-      dataChange.presentValue = JSON.stringify(presentData);
-      dataChange.previousValue = JSON.stringify(previousData);
-      return dataChange;
-    })
+    if(!withPassword) {
+      searchResult.map(dataChange=>{
+        const {password:presentPassword,...presentData}: Password = JSON.parse(dataChange.presentValue);
+        const {password:previousPassword,...previousData}: Password = JSON.parse(dataChange.previousValue);
+  
+        dataChange.presentValue = JSON.stringify(presentData);
+        dataChange.previousValue = JSON.stringify(previousData);
+        return dataChange;
+      })
+    }
+
+    return searchResult;
+  }
+
+  public async getDataChange(recordId: number,withPassword?:boolean): Promise<DataChange> {
+    let searchResult: DataChange = null;
+
+    searchResult = await this.dataQB
+      .where('DataChange.recordId = :recordId', { recordId })
+      .getOne();
+      
+    if(!withPassword) {
+      const {password:presentPassword,...presentData}: Password = JSON.parse(searchResult.presentValue);
+      const {password:previousPassword,...previousData}: Password = JSON.parse(searchResult.previousValue);
+
+      searchResult.presentValue = JSON.stringify(presentData);
+      searchResult.previousValue = JSON.stringify(previousData);
+    }
 
     return searchResult;
   }

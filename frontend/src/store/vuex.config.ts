@@ -20,7 +20,8 @@ import {
   deletePasword,
   sharePassword,
   getHistory,
-  getDataChanges
+  getDataChanges,
+  revertChanges
 } from "./store.functions";
 import {
   IInitalState,
@@ -102,6 +103,8 @@ export default createStore({
       toggleSiteMode(context, payload),
     [StoreActions.SET_MODIFY_PASSWORD]: (context, payload) =>
       setModifyPassword(context, payload),
+    [StoreActions.REVERT_CHANGES]: (context, payload) =>
+      revertChanges(context, payload),
     [StoreActions.MODIFY_PASSWORD]: (context, payload) =>
       updatePassword(context, payload),
     [StoreActions.DELETE_PASSWORD]: (context, payload) =>

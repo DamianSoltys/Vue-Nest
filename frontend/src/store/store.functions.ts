@@ -91,6 +91,16 @@ export async function addPassword(
   return await passwordService.addPassword(payload);
 }
 
+export async function revertChanges(
+  { commit, state }: ActionContext<IInitalState, IInitalState>,
+  payload: number
+): Promise<boolean> {
+  const data = await historyService.revertData(payload);
+  
+  store.dispatch(StoreActions.GET_PASSWORDS);
+  return data;
+}
+
 //TODO: implement
 export async function getPasswords({
   commit,
@@ -145,7 +155,9 @@ export async function deletePasword(
   payload: number
 ) {
   const data = await passwordService.deletePassword(payload);
+  
   store.dispatch(StoreActions.GET_PASSWORDS);
+  return data;
 }
 
 //TODO: implement

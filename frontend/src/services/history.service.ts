@@ -46,6 +46,37 @@ export class HistoryService {
 
     return data;
   }
+
+  public async revertData(recordId:number): Promise<any> {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
+
+    const raw = JSON.stringify({recordId});
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw
+    };
+    const request: any = await fetch(
+      "http://localhost:3000/changes",
+      requestOptions
+    )
+      .then(response => errorService.handleError(response))
+      .then(response => response.json())
+      .then(result => {
+        errorService.handleResponse(
+          IResponseType.SUCCESS,
+          "Password updated successfully."
+        );
+        return result;
+      })
+      .catch(error =>
+        errorService.handleResponse(IResponseType.ERROR, error.message)
+      );
+
+    return request;
+  }
 }
 
 export const historyService = new HistoryService();
