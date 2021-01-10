@@ -64,6 +64,8 @@
 import { defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { IInitalState, StoreActions } from "../../store/store.interface";
+import { errorService } from "../../services/error.service";
+import { FormTypeEnum } from "../../interfaces/error.interface";
 
 export default defineComponent({
   setup() {
@@ -72,21 +74,23 @@ export default defineComponent({
       username: "",
       password: "",
       passwordConfirm: "",
-      algorithmType: "HMAC"
+      algorithmType: "HMAC",
     });
 
     function handleSubmit() {
       const data = {
         username: form.username,
         password: form.password,
-        algorithmType: form.algorithmType
+        algorithmType: form.algorithmType,
       };
 
-      store.dispatch(StoreActions.REGISTER_USER, data);
+      if (!errorService.validateForm(form, FormTypeEnum.REGISTER)) {
+        store.dispatch(StoreActions.REGISTER_USER, data);
+      }
     }
 
     return { form, handleSubmit };
-  }
+  },
 });
 </script>
 

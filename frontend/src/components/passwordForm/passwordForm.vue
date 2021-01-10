@@ -56,6 +56,7 @@
 import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { IInitalState, StoreActions } from "../../store/store.interface";
+import { errorService } from "../../services/error.service";
 
 export default defineComponent({
   setup(props, { emit }) {
@@ -87,9 +88,11 @@ export default defineComponent({
         ? { ...form, userId: state.userId, id: state.editData.id }
         : { ...form, userId: state.userId };
 
-      state.editData
-        ? store.dispatch(StoreActions.MODIFY_PASSWORD, data)
-        : store.dispatch(StoreActions.ADD_PASSWORD, data);
+      if (!errorService.validateForm(form)) {
+        state.editData
+          ? store.dispatch(StoreActions.MODIFY_PASSWORD, data)
+          : store.dispatch(StoreActions.ADD_PASSWORD, data);
+      }
     }
 
     return { form, state, handleSubmit };

@@ -44,6 +44,7 @@
 import { defineComponent, onMounted, reactive, ref, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { IInitalState, StoreActions } from "../../store/store.interface";
+import { errorService } from "../../services/error.service";
 
 export default defineComponent({
   setup() {
@@ -69,7 +70,9 @@ export default defineComponent({
     });
 
     function handleSubmit() {
-      store.dispatch(StoreActions.LOGIN_USER, form);
+      if (!errorService.validateForm(form)) {
+        store.dispatch(StoreActions.LOGIN_USER, form);
+      }
     }
 
     function handleUnblock() {

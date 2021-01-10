@@ -3,8 +3,8 @@
     <div
       class="toast d-flex align-items-center text-white border-0"
       v-bind:class="{
-        'bg-success': state.type === IResponseType.SUCCESS,
-        'bg-danger': state.type === IResponseType.ERROR,
+        'bg-success': state.type === ResponseTypeEnum.SUCCESS,
+        'bg-danger': state.type === ResponseTypeEnum.ERROR,
       }"
       role="alert"
       aria-live="assertive"
@@ -41,7 +41,7 @@ import {
 import { useStore } from "vuex";
 import { IInitalState, StoreActions } from "../../store/store.interface";
 import { Toast } from "bootstrap";
-import { IResponseType } from "../../interfaces/error.interface";
+import { ResponseTypeEnum } from "../../interfaces/error.interface";
 
 export default defineComponent({
   setup() {
@@ -73,7 +73,7 @@ export default defineComponent({
       state.unsubscribe();
     });
 
-    return { state, IResponseType };
+    return { state, ResponseTypeEnum };
   },
 });
 </script>

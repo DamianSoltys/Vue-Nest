@@ -90,15 +90,37 @@
             </button>
           </span>
           <div class="btn-group w-100 m-2 change-dropdown">
-            <button type="button" class="btn btn-primary" @click="getChanges(password.id)">Zobacz historię</button>
-            <button v-if="state.actualPasswordDataId === password.id" type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" :disabled="!state.dataChanges.length"></button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="getChanges(password.id)"
+            >
+              Zobacz historię
+            </button>
+            <button
+              v-if="state.actualPasswordDataId === password.id"
+              type="button"
+              class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              :disabled="!state.dataChanges.length"
+            ></button>
             <ul class="dropdown-menu">
-              <li v-for="dataChanges of state.dataChanges" :key="dataChanges.id">
+              <li
+                v-for="dataChanges of state.dataChanges"
+                :key="dataChanges.id"
+              >
                 <a class="dropdown-item">
-                  <p>id: {{dataChanges.id}}</p>
-                  <p>typ: {{dataChanges.functionType}}</p>
-                  <p class="json-data">dane: {{dataChanges.previousValue}}</p>
-                  <button class="btn btn-primary" @click="revertData(password.id)">Cofnij</button>
+                  <p>id: {{ dataChanges.id }}</p>
+                  <p>typ: {{ dataChanges.functionType }}</p>
+                  <p class="json-data">dane: {{ dataChanges.previousValue }}</p>
+                  <button
+                    class="btn btn-primary"
+                    @click="revertData(dataChanges.id)"
+                  >
+                    Cofnij
+                  </button>
                 </a>
               </li>
             </ul>
@@ -207,7 +229,7 @@ export default defineComponent({
       sharePassword: {} as IPasswordData,
       tooltips: [] as Tooltip[],
       dropdowns: [] as Dropdown[],
-      actualPasswordDataId:-1,
+      actualPasswordDataId: -1,
     });
     const form = reactive({
       username: "",
@@ -224,7 +246,7 @@ export default defineComponent({
 
     function setDropdowns() {
       const dropdownTriggerList = [].slice.call(
-        document.querySelectorAll('.dropdown-toggle')
+        document.querySelectorAll(".dropdown-toggle")
       );
       state.dropdowns = dropdownTriggerList.map(function (dropdownTriggerEl) {
         return new Dropdown(dropdownTriggerEl);
@@ -238,7 +260,7 @@ export default defineComponent({
     onUpdated(() => {
       setTooltips();
       setDropdowns();
-      console.log(state)
+      console.log(state);
     });
 
     function getChanges(recordId: number) {
@@ -278,8 +300,8 @@ export default defineComponent({
       store.dispatch(StoreActions.SET_MODIFY_PASSWORD, password);
     }
 
-    function revertData(recordId: number) {
-      store.dispatch(StoreActions.REVERT_CHANGES, recordId);
+    function revertData(dataId: number) {
+      store.dispatch(StoreActions.REVERT_CHANGES, dataId);
     }
 
     function sharePassword(username: string) {

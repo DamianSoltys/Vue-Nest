@@ -1,4 +1,4 @@
-import { IResponseType } from "@/interfaces/error.interface";
+import { ResponseTypeEnum } from "@/interfaces/error.interface";
 import {
   IChangePasswordData,
   IDecryptPasswordData,
@@ -29,13 +29,13 @@ export class PasswordService {
       .then(response => response.json())
       .then(result => {
         errorService.handleResponse(
-          IResponseType.SUCCESS,
+          ResponseTypeEnum.SUCCESS,
           "Password added successfully."
         );
         return result;
       })
       .catch(error =>
-        errorService.handleResponse(IResponseType.ERROR, error.message)
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message)
       );
 
     return request;
@@ -61,13 +61,13 @@ export class PasswordService {
       .then(response => response.json())
       .then(result => {
         errorService.handleResponse(
-          IResponseType.SUCCESS,
+          ResponseTypeEnum.SUCCESS,
           "Password updated successfully."
         );
         return result;
       })
       .catch(error =>
-        errorService.handleResponse(IResponseType.ERROR, error.message)
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message)
       );
 
     return request;
@@ -88,7 +88,7 @@ export class PasswordService {
       .then(response => response.json())
       .then(result => result)
       .catch(error =>
-        errorService.handleResponse(IResponseType.ERROR, error.message)
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message)
       );
 
     return data;
@@ -112,13 +112,13 @@ export class PasswordService {
       .then(response => response.json())
       .then(result => {
         errorService.handleResponse(
-          IResponseType.SUCCESS,
+          ResponseTypeEnum.SUCCESS,
           `Password shared successfully with ${sharePasswordData.username}.`
         );
         return result;
       })
       .catch(error =>
-        errorService.handleResponse(IResponseType.ERROR, error.message)
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message)
       );
 
     return data;
@@ -139,13 +139,13 @@ export class PasswordService {
       .then(response => response.json())
       .then(result => {
         errorService.handleResponse(
-          IResponseType.SUCCESS,
+          ResponseTypeEnum.SUCCESS,
           "Password deleted successfully."
         );
         return result;
       })
       .catch(error =>
-        errorService.handleResponse(IResponseType.ERROR, error.message)
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message)
       );
 
     return data;
@@ -171,7 +171,7 @@ export class PasswordService {
       .then(response => response.text())
       .then(result => result)
       .catch(error =>
-        errorService.handleResponse(IResponseType.ERROR, error.message)
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message)
       );
 
     return data || "";

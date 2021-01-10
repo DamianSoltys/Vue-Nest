@@ -80,37 +80,55 @@ export class QueryService {
     return searchResult;
   }
 
-  public async getDataChanges(recordId: number,withPassword?:boolean): Promise<DataChange[]> {
+  public async getDataChanges(
+    recordId: number,
+    withPassword?: boolean,
+  ): Promise<DataChange[]> {
     let searchResult: DataChange[] = null;
 
     searchResult = await this.dataQB
       .where('DataChange.recordId = :recordId', { recordId })
       .getMany();
 
-    if(!withPassword) {
-      searchResult.map(dataChange=>{
-        const {password:presentPassword,...presentData}: Password = JSON.parse(dataChange.presentValue);
-        const {password:previousPassword,...previousData}: Password = JSON.parse(dataChange.previousValue);
-  
+    if (!withPassword) {
+      searchResult.map(dataChange => {
+        const {
+          password: presentPassword,
+          ...presentData
+        }: Password = JSON.parse(dataChange.presentValue);
+        const {
+          password: previousPassword,
+          ...previousData
+        }: Password = JSON.parse(dataChange.previousValue);
+
         dataChange.presentValue = JSON.stringify(presentData);
         dataChange.previousValue = JSON.stringify(previousData);
         return dataChange;
-      })
+      });
     }
 
     return searchResult;
   }
 
-  public async getDataChange(recordId: number,withPassword?:boolean): Promise<DataChange> {
+  public async getDataChange(
+    dataId: number,
+    withPassword?: boolean,
+  ): Promise<DataChange> {
     let searchResult: DataChange = null;
 
     searchResult = await this.dataQB
-      .where('DataChange.recordId = :recordId', { recordId })
+      .where('DataChange.id = :id', { id: dataId })
       .getOne();
-      
-    if(!withPassword) {
-      const {password:presentPassword,...presentData}: Password = JSON.parse(searchResult.presentValue);
-      const {password:previousPassword,...previousData}: Password = JSON.parse(searchResult.previousValue);
+
+    if (!withPassword) {
+      const {
+        password: presentPassword,
+        ...presentData
+      }: Password = JSON.parse(searchResult.presentValue);
+      const {
+        password: previousPassword,
+        ...previousData
+      }: Password = JSON.parse(searchResult.previousValue);
 
       searchResult.presentValue = JSON.stringify(presentData);
       searchResult.previousValue = JSON.stringify(previousData);

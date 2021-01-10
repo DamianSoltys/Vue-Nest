@@ -1,4 +1,4 @@
-import { IResponseType } from "@/interfaces/error.interface";
+import { ResponseTypeEnum } from "@/interfaces/error.interface";
 import { IChangePasswordData } from "@/interfaces/password.interface";
 import {
   ILoginData,
@@ -26,12 +26,15 @@ export class UserService {
       .then(response => errorService.handleError(response))
       .then(response => response.json())
       .then(result => {
-        errorService.handleResponse(IResponseType.SUCCESS, "Login successful");
+        errorService.handleResponse(
+          ResponseTypeEnum.SUCCESS,
+          "Login successful"
+        );
 
         return result;
       })
       .catch(error => {
-        errorService.handleResponse(IResponseType.ERROR, error.message);
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message);
       });
 
     if (request?.accessToken) {
@@ -63,14 +66,14 @@ export class UserService {
       .then(response => response.json())
       .then(result => {
         errorService.handleResponse(
-          IResponseType.SUCCESS,
+          ResponseTypeEnum.SUCCESS,
           "Register successful, you can now login."
         );
 
         return result;
       })
       .catch(error => {
-        errorService.handleResponse(IResponseType.ERROR, error.message);
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message);
       });
   }
 
@@ -92,14 +95,14 @@ export class UserService {
       .then(response => response.text())
       .then(result => {
         errorService.handleResponse(
-          IResponseType.SUCCESS,
+          ResponseTypeEnum.SUCCESS,
           "Password changed successfully."
         );
 
         return result;
       })
       .catch(error => {
-        errorService.handleResponse(IResponseType.ERROR, error.message);
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message);
       });
 
     if (request) {
@@ -125,7 +128,7 @@ export class UserService {
       .then(response => response.text())
       .then(result => console.log(result))
       .catch(error => {
-        errorService.handleResponse(IResponseType.ERROR, error.message);
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message);
       });
 
     return false;
@@ -145,13 +148,13 @@ export class UserService {
       .then(response => errorService.handleError(response))
       .then(response => {
         errorService.handleResponse(
-          IResponseType.SUCCESS,
+          ResponseTypeEnum.SUCCESS,
           "Your address was unblocked, try login again."
         );
         return response;
       })
       .catch(error =>
-        errorService.handleResponse(IResponseType.ERROR, error.message)
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message)
       );
 
     return data ? true : false;

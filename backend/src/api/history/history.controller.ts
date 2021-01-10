@@ -48,9 +48,9 @@ export class HistoryController {
   }
 
   @Post('changes')
-  async modifyData(@Body() recordId: number) {
+  async modifyData(@Body() { dataId }: { dataId: number }) {
     try {
-      return await this.history.modifyData(recordId);
+      return await this.history.modifyData(dataId);
     } catch {
       throw new HttpException(
         {

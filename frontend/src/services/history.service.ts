@@ -1,4 +1,4 @@
-import { IResponseType } from "@/interfaces/error.interface";
+import { ResponseTypeEnum } from "@/interfaces/error.interface";
 import { IDataChange, IHistoryLog } from "@/interfaces/history.interface";
 import { IPasswordData } from "@/interfaces/password.interface";
 import { errorService } from "./error.service";
@@ -20,7 +20,7 @@ export class HistoryService {
       .then(response => response.json())
       .then(result => result)
       .catch(error =>
-        errorService.handleResponse(IResponseType.ERROR, error.message)
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message)
       );
 
     return data;
@@ -41,38 +41,38 @@ export class HistoryService {
       .then(response => response.json())
       .then(result => result)
       .catch(error =>
-        errorService.handleResponse(IResponseType.ERROR, error.message)
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message)
       );
 
     return data;
   }
 
-  public async revertData(recordId:number): Promise<any> {
+  public async revertData(dataId: number): Promise<any> {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
 
-    const raw = JSON.stringify({recordId});
+    const raw = JSON.stringify({ dataId });
     const requestOptions: RequestInit = {
       method: "POST",
       headers: myHeaders,
       body: raw
     };
     const request: any = await fetch(
-      "http://localhost:3000/changes",
+      "http://localhost:3000/history/changes",
       requestOptions
     )
       .then(response => errorService.handleError(response))
       .then(response => response.json())
       .then(result => {
         errorService.handleResponse(
-          IResponseType.SUCCESS,
+          ResponseTypeEnum.SUCCESS,
           "Password updated successfully."
         );
         return result;
       })
       .catch(error =>
-        errorService.handleResponse(IResponseType.ERROR, error.message)
+        errorService.handleResponse(ResponseTypeEnum.ERROR, error.message)
       );
 
     return request;

@@ -5,7 +5,10 @@ import { QueryService } from 'src/database/modules/shared/query.service';
 
 @Injectable()
 export class HistoryControllerService {
-  constructor(private queryService: QueryService,private passwordService: PasswordService) {}
+  constructor(
+    private queryService: QueryService,
+    private passwordService: PasswordService,
+  ) {}
 
   async getHistoryLogs(userId: number): Promise<HistoryLog[]> {
     return await this.queryService.getHistoryLog(userId);
@@ -15,8 +18,8 @@ export class HistoryControllerService {
     return await this.queryService.getDataChanges(recordId);
   }
 
-  async modifyData(recordId: number): Promise<boolean> {
-    const data = await this.passwordService.revertPasswordData(recordId);
+  async modifyData(dataId: number): Promise<boolean> {
+    const data = await this.passwordService.revertPasswordData(dataId);
 
     return data ? true : false;
   }
